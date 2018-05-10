@@ -256,6 +256,7 @@ public class Controller {
                     if (input == 1101) {
 //                       upgrade barrack
                         if (currentBarrack != null) {
+                            currentBuilding = currentBarrack;
                             view.wantUpgradeNameForCostGolds(currentBarrack.getJasonType(), currentBarrack.getCostOfUpgrade()[0]);
                         } else {
                             System.err.println("BUG!!!!!!");
