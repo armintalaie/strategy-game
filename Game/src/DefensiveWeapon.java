@@ -154,6 +154,7 @@ class ArcherTower extends DefensiveWeapon {
     }
 
     public void upgrade() {
+        level += 1;
         hitPower += 1;
         resistence += 10;
     }
@@ -277,6 +278,7 @@ class Cannon extends DefensiveWeapon {
     }
 
     public void upgrade() {
+        level += 1;
         hitPower += 1;
         resistence += 10;
     }
@@ -405,6 +407,7 @@ class WizardTower extends DefensiveWeapon {
     }
 
     public void upgrade() {
+        level += 1;
         hitPower += 1;
         resistence += 10;
     }
@@ -524,6 +527,7 @@ class AirDefense extends DefensiveWeapon {
     }
 
     public void upgrade() {
+        level += 1;
         hitPower += 1;
         resistence += 10;
     }

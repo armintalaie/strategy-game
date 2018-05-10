@@ -1033,7 +1033,7 @@ public class View {
             return 8;
         if (Pattern.matches("Cannon\\s*\\d*", command))
             return 9;
-        if (Pattern.matches("Air defense", command))
+        if (Pattern.matches("Air defense\\s*\\d*", command))
             return 10;
         if (Pattern.matches("Wizard tower\\s*\\d*", command))
             return 11;
