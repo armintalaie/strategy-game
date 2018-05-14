@@ -12,7 +12,7 @@ public class Controller {
     Camp currentCamp = null;
     int currentSoldierTypeToBeBuilt = 0;
     int currentBuildingTypeToBeBuilt = 0;
-    int input = 0;
+    Integer input = 0;
     int timeAttack = 0;
 
     public void runGame() {
