@@ -1,3 +1,8 @@
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 class Person {
     protected int type;
     protected int costOfProduction;
@@ -31,27 +36,63 @@ class Person {
     }
 
     int[] move(int[] target, EnemyMap map) {
+        Integer [] shuffle = new Integer[]{0,1,2,3,4,5,6,7};
+        List<Integer> list = Arrays.asList(shuffle);
+        Collections.shuffle(list);
+
         direction dir = null;
         double distance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] - target[0]), 2) + Math.pow(Math.abs(currentPosition[1] - target[1]), 2));
+
+        for(Integer index = 0 ; index < 7 ; index++){
+
+        if(list.get(index) == 0)
         if (currentPosition[0] > 0 && map.getMap()[currentPosition[0] - 1][currentPosition[1]].isEmpty()) {
             double newDistance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] - 1 - target[0]), 2) + Math.pow(Math.abs(currentPosition[1] - target[1]), 2));
             if (newDistance < distance)
                 dir = direction.UP;
         }
+            if(list.get(index) == 1)
         if (currentPosition[1] > 0 && map.getMap()[currentPosition[0]][currentPosition[1] - 1].isEmpty()) {
             double newDistance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] - target[0]), 2) + Math.pow(Math.abs(currentPosition[1] - 1 - target[1]), 2));
             if (newDistance < distance)
                 dir = direction.LEFT;
         }
+            if(list.get(index) == 2)
         if (currentPosition[0] < 29 && map.getMap()[currentPosition[0] + 1][currentPosition[1]].isEmpty()) {
             double newDistance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] + 1 - target[0]), 2) + Math.pow(Math.abs(currentPosition[1] - target[1]), 2));
             if (newDistance < distance)
                 dir = direction.DOWN;
         }
-        if (currentPosition[1] < 29 && map.getMap()[currentPosition[0]][currentPosition[1] + 1].isEmpty()) {
+            if(list.get(index) == 3)
+                if (currentPosition[1] < 29 && map.getMap()[currentPosition[0]][currentPosition[1] + 1].isEmpty()) {
             double newDistance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] - target[0]), 2) + Math.pow(Math.abs(currentPosition[1] + 1 - target[1]), 2));
             if (newDistance < distance)
                 dir = direction.RIGHT;
+        }
+            if(list.get(index) == 4)
+                if (currentPosition[0] > 0 && currentPosition[1] > 0 && map.getMap()[currentPosition[0] - 1][currentPosition[1] - 1].isEmpty()) {
+                    double newDistance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] -1- target[0]), 2) + Math.pow(Math.abs(currentPosition[1] - 1 - target[1]), 2));
+                    if (newDistance < distance)
+                        dir = direction.UpLeft;
+                }
+            if(list.get(index) == 5)
+                if (currentPosition[0] > 0 && currentPosition[1] < 29 && map.getMap()[currentPosition[0] - 1][currentPosition[1] + 1].isEmpty()) {
+                    double newDistance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] -1- target[0]), 2) + Math.pow(Math.abs(currentPosition[1] + 1 - target[1]), 2));
+                    if (newDistance < distance)
+                        dir = direction.UpRight;
+                }
+            if(list.get(index) == 6)
+                if (currentPosition[0] < 29 && currentPosition[1] > 0 && map.getMap()[currentPosition[0] + 1][currentPosition[1] - 1].isEmpty()) {
+                    double newDistance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] + 1- target[0]), 2) + Math.pow(Math.abs(currentPosition[1] - 1 - target[1]), 2));
+                    if (newDistance < distance)
+                        dir = direction.DownLeft;
+                }
+            if(list.get(index) == 7)
+                if (currentPosition[0] < 29 && currentPosition[1] < 29 && map.getMap()[currentPosition[0] + 1][currentPosition[1] + 1].isEmpty()) {
+                    double newDistance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] + 1- target[0]), 2) + Math.pow(Math.abs(currentPosition[1] + 1 - target[1]), 2));
+                    if (newDistance < distance)
+                        dir = direction.DownRight;
+                }
         }
         if (dir == direction.LEFT)
             currentPosition[1]--;
@@ -61,6 +102,23 @@ class Person {
             currentPosition[0]--;
         if (dir == direction.DOWN)
             currentPosition[0]++;
+        if (dir == direction.UpRight){
+            currentPosition[1]++;
+            currentPosition[0]--;
+        }
+        if (dir == direction.UpLeft){
+            currentPosition[1]--;
+            currentPosition[0]--;
+        }
+        if (dir == direction.DownRight){
+            currentPosition[1]--;
+            currentPosition[0]++;
+        }
+        if (dir == direction.DownRight){
+            currentPosition[1]++;
+            currentPosition[0]++;
+        }
+
         return null;
     }
 
@@ -141,7 +199,7 @@ class Person {
     }
 
     enum direction {
-        UP, RIGHT, DOWN, LEFT
+        UP, RIGHT, DOWN, LEFT , UpRight , UpLeft , DownLeft , DownRight
     }
 
 }
@@ -301,7 +359,8 @@ class Giant extends Person {
         target[0] = -1;
         target[1] = -1;
         double distance;
-        for (int i = 0; i < map.getBuildings().size(); i++) {
+        for (int i = 0; i < map.getMapBuildings().size(); i++) {
+            System.out.println("hello");
             if (map.getMapBuildings().get(i).getJasonType() <= 4 && map.getMapBuildings().get(i).getJasonType() >= 1) {
 
                 distance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] - map.getMapBuildings().get(i).getPosition()[0]), 2) + Math.pow(Math.abs(currentPosition[1] - map.getMapBuildings().get(i).getPosition()[1]), 2));
@@ -312,6 +371,7 @@ class Giant extends Person {
                 }
             }
         }
+
         if (minDistance != Math.sqrt(2) * 30)
             return target;
         for (int i = 0; i < map.getDefensiveWeapons().size(); i++) {

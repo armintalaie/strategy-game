@@ -595,8 +595,13 @@ public class View {
             setUpVillageMenu();
             return 7;
         }
+        if(Pattern.matches("", command))
+            return 10;
         if (Pattern.matches("turn\\d+", command))
             return 8;
+        if (Pattern.matches("Put [A-z][a-z]+\\s*\\d+ in \\d+,\\d+", command))
+            return 11;
+
         invalidCommand();
         return 9;
     }
@@ -1135,24 +1140,61 @@ public class View {
         System.out.println("Elixir: " + elixir);
         for (int type = 1; type <= 14; type++) {
             int number = 0;
+            String soldierType = null ;
             for (EnemyBuilding enemyBuilding : enemyBuildings)
                 if (enemyBuilding.getType() == type)
                     number++;
-            if (number > 0)
-                System.out.println(type + ": " + number);
+            if (number > 0){
+                switch (type){
+                    case 1:{
+                        soldierType = "Gold mine";
+                        break;}
+                    case 2:{
+                        soldierType = "Elixir mine";
+                        break;}
+                    case 3:{
+                        soldierType = "Gold Storage";
+                        break;}
+                    case 4:{
+                        soldierType = "Elixir Storage";
+                        break;}
+                    case 5:{
+                        soldierType = "Main Building";
+                        break;}
+                    case 6:{
+                        soldierType = "Barracks";
+                        break;}
+                    case 7:{
+                        soldierType = "Camp";
+                        break;}
+                    case 8:{
+                        soldierType = "Archer tower";
+                        break;}
+                    case 9:{
+                        soldierType = "Cannon";
+                        break;}
+                    case 10:{
+                        soldierType = "Air defense";
+                        break;}
+                    case 11:{
+                        soldierType = "Wizard tower";
+                        break;}
+                }
+                System.out.println(soldierType+" ("+type + ") : " + number);
+            }
         }
     }
 
     public void statusUnitPrint(ArrayList<Person> units) {
         for (Person p : units) {
-            System.out.println(convertSoldierTypeToString(p.getType()) + " level = " + p.getLevel() + " in(" + p.getCurrentPosition()[0] + ",)" + p.getCurrentPosition()[1]
-                    + " with health = " + p.getHealth());
+            System.out.println(convertSoldierTypeToString(p.getType()) + " level = " + p.getLevel() + " in(" + p.getCurrentPosition()[0] + "," + p.getCurrentPosition()[1]
+                    + ") with health = " + p.getHealth());
         }
     }
 
     public void statusBuilding(ArrayList<Building> buildings) {
         for (Building building : buildings) {
-            System.out.print(building.getJasonType() + " level = " + building.getLevel() + " in ");
+            System.out.print(singleBuildingShowerByType(building.getJasonType())+ " level = " + building.getLevel() + " in ");
             System.out.print("(" + building.getPosition()[0] + "," + building.getPosition()[1] + ") ");
             System.out.print("with health = " + building.getHealth() + "\n");
         }
@@ -1160,7 +1202,7 @@ public class View {
 
     public void statusDefensiveWeapon(ArrayList<DefensiveWeapon> defensiveWeapons) {
         for (DefensiveWeapon defensiveWeapon : defensiveWeapons) {
-            System.out.print(defensiveWeapon.getARM_TYPE() + " level = " + defensiveWeapon.getLevel() + " in ");
+            System.out.print(singleBuildingShowerByType(defensiveWeapon.getARM_TYPE())+ " level = " + defensiveWeapon.getLevel() + " in ");
             System.out.print("(" + defensiveWeapon.getPosition()[0] + "," + defensiveWeapon.getPosition()[1] + ") ");
             System.out.print("with health = " + defensiveWeapon.getResistence() + "\n");
         }

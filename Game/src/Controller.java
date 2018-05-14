@@ -327,6 +327,10 @@ public class Controller {
                         int elixir = world.currentEnemy.getResources().get("elixir");
                         view.showEnemyMapInfo(gold, elixir, world.currentEnemy.getBuildings());
                     }
+                    if(input == 1503){
+                        view.setUpMapMenu2002();
+                        view.currentMenuType = Menu.MAP_MENU ;
+                    }
                     break;
                 }
                 case 16: {
@@ -500,7 +504,7 @@ public class Controller {
                     EnemyMap enemyMap = world.currentEnemy;
                     Game currentGame = world.currentGame;
                     for (Person person : currentGame.getOwnMap().valuableSoldiers)
-                        if (person.getType() != 6) {
+                        if (person.getType() != 6 && person.getInEnemyMap()) {
                             int[] target = person.operate(enemyMap);
                             if (target != null)
                                 hitEnemyBuilding(target, enemyMap);
@@ -579,6 +583,23 @@ public class Controller {
                             continue;
                         }
                     }
+                    if(input == 11){
+                        Pattern putUnit = Pattern.compile("Put ([A-Z][a-z]+)\\s*(\\d+) in (\\d+),(\\d+)");
+                        Matcher matcher = putUnit.matcher(view.getCommand());
+                        if (matcher.find()) {
+                            if (world.currentEnemy.getMap()[Integer.parseInt(matcher.group(3))][Integer.parseInt(matcher.group(4))].isEmpty()) {
+                                int r = world.currentGame.putSoldier(view.soldierTypeRecognizer(matcher.group(1)),
+                                        Integer.parseInt(matcher.group(2)),
+                                        Integer.parseInt(matcher.group(3)),
+                                        Integer.parseInt(matcher.group(4)), world.currentEnemy);
+                                if (r == 1)
+                                    view.invalidPut();
+                                if (r == -1)
+                                    System.err.println("invalid put");
+                            } else
+                                view.invalidPut();
+                        }
+                    }
                     break;
                 }
             }
@@ -586,7 +607,7 @@ public class Controller {
         }
     }
 
-    public int IDrecognizer(String nameID) {
+    private int IDrecognizer(String nameID) {
         Pattern nameIdPattern = Pattern.compile("(.*)[a-z]\\s*(\\d+)");
         Matcher matcher = nameIdPattern.matcher(nameID);
         if (matcher.find()) {
@@ -596,7 +617,7 @@ public class Controller {
         return -1000000000;
     }
 
-    public void endToUprating() {
+    private void endToUprating() {
         if (currentDefensiveWeapon != null) {
             view.setUpDefensiveWeaponInfoMenu121();
         } else {
@@ -691,8 +712,14 @@ public class Controller {
 
     private void updateAttackMap(ArrayList<Person> soldiers, EnemyMap enemyMap, Map map, Game game) {
         for (int index = 0; index < soldiers.size(); index++)
-            if (soldiers.get(index).getHealth() <= 0)
+            if (soldiers.get(index).getHealth() <= 0){
+                for(int indexPrime = 0 ; indexPrime < game.getOwnMap().soldiers.size() ; indexPrime++)
+                    if(game.getOwnMap().soldiers.get(indexPrime).getType() == soldiers.get(index).getType()) {
+                        game.getOwnMap().soldiers.remove(indexPrime);
+                        break;
+                    }
                 soldiers.remove(index);
+        }
         for (int index = 0; index < enemyMap.getMapBuildings().size(); index++)
             if (enemyMap.getMapBuildings().get(index).getResistance() <= 0) {
                 if (enemyMap.getMapBuildings().get(index).getJasonType() == 3) {
@@ -731,7 +758,7 @@ public class Controller {
         return false;
     }
 
-    public void empty(EnemyMap enemyMap, int x, int y) {
+    private void empty(EnemyMap enemyMap, int x, int y) {
         enemyMap.getMap()[x][y].setEmpty(true);
     }
 }
