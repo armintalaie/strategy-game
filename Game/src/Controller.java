@@ -18,175 +18,39 @@ public class Controller {
     public void runGame() {
         view.showInitialMenue();
         input = view.updateView();
-
         while (input != -20) {
             currentCommand = view.getCommand();
-            System.err.println("current command is : " + view.getCommand());
-            System.err.println("current input value is : " + input);
-
+//            System.err.println("current command is : " + view.getCommand());
+//            System.err.println("current input value is : " + input);
             switch (input / 100) {
                 case 0: {
-                    if (input == 1) {
-                        String temp[] = view.getCommand().split(" ");
-                        world.currentGame.turnTimeOwnMap(Integer.parseInt(temp[1]));
-                    }
-                    if (input == 2) {
-                        Pattern saveAddress = Pattern.compile("save (.*)");
-                        Matcher matcher = saveAddress.matcher(view.getCommand());
-                        if (matcher.find()) {
-                            world.saveGame(matcher.group(1), world);
-                        }
-                    }
+                    onlineCommandsControlling();
+                    break;
                 }
                 case 1: {
 //                    initial menu
-                    if (input == 101) {
-                        world.newGameMaker();
-                        view.setUpVillageMenu();
-                    }
-                    if (input == 102) {
-                        //loadGame
-                        Pattern loadAddress = Pattern.compile("load (.*)");
-                        Matcher matcher = loadAddress.matcher(view.getCommand());
-//                        load game
-                        if (matcher.find()) {
-                            this.world = world.loadGame(matcher.group(1), view);
-                            if (world.games.size() > 0) {
-                                this.world.currentGame = world.games.get(0);
-                            }
-                        }
-                    }
+                    initialMenuCommandControlling1();
                     break;
                 }
                 case 2: {
 //                    village menu
-                    if (input == 201) {
-//                        attack
-                        view.currentMenuType = Menu.ATTACK_MENU;
-                        view.setUpAttackMenu2000(world.getEnemyMaps());
-                    }
-                    if (input == 202) {
-//                        show buildings
-                        for (Building b : world.currentGame.getOwnMap().getBuildings()) {
-                            view.buildingShowerTypeID(b.getJasonType(), b.getId());
-                        }
-                        System.err.println(world.currentGame.getOwnMap().getBuildings().size());
-                        if (world.currentGame.getOwnDefensiveWeapon() != null) {
-                            for (DefensiveWeapon d : world.currentGame.getOwnDefensiveWeapon()) {
-                                view.buildingShowerTypeID(d.getARM_TYPE(), d.getId());
-                            }
-                        }
-                    }
-                    if (input == 203) {
-//                        resources
-                        view.shoeResources(world.currentGame.getOwnResources(), world.currentGame.getOwnScore());
-                    }
-                    if (input >= 204 && input <= 207) {
-                        //a type building is selected
-                        currentBuilding = world.currentGame.findBuildingTypeInOwnMap(input - 203, IDrecognizer(currentCommand));
-                        if (currentBuilding == null) {
-                            view.noSuchBuilding();
-                            view.setUpVillageMenu();
-                        } else {
-                            if (input == 204 || input == 205) {
-                                //mine
-                                view.setUpMineMenu();
-                            } else view.setUpStorageMenu();
-                        }
-                    }
-//                    208 -->mainHall
-                    if (input == 209) {
-//                        barrack selected
-                        //  if (currentBuilding.getClass().getName().equals("Barracks")) {
-                        currentBarrack = (Barracks) world.currentGame.findBuildingTypeInOwnMap(input - 203, IDrecognizer(currentCommand));
-                        if (currentBarrack == null) {
-                            view.noSuchBuilding();
-                            view.setUpVillageMenu();
-                        } else view.setUpBarracksMenu4();
-                    }
-                    if (input == 210) {
-//                        camp selected
-                        currentCamp = (Camp) world.currentGame.findBuildingTypeInOwnMap(input - 203, IDrecognizer(currentCommand));
-                        if (currentCamp == null) {
-                            view.noSuchBuilding();
-                            view.setUpVillageMenu();
-                        } else view.setUpCampMenu8();
-                    }
-                    if (input >= 211 && input <= 214) {
-//                        defensive Weapon selected
-                        currentDefensiveWeapon = world.currentGame.findDefensiveWeaponTypeInOwnMap(input - 203, IDrecognizer(currentCommand));
-                        if (currentDefensiveWeapon == null) {
-                            view.noSuchBuilding();
-                            view.setUpVillageMenu();
-                        } else
-                            view.setUpDefensiveWeaponMenu12();
-                    }
+                    villageMenuCommandControlling2();
                     break;
                 }
                 case 3: {
 //                    mine menu
-//                    301 -->info
-                    if (input == 302) {
-                        if (currentBuilding.getJasonType() == 1) {
-                            GoldMine temp = (GoldMine) currentBuilding;
-                            view.printMine(temp.getGoldProduce());
-                        } else {
-                            ElixirMine temp = (ElixirMine) currentBuilding;
-                            view.printMine(temp.getElixirProduce());
-                        }
-                    }
-                    if (input == 303) {
-//                        back
-                        currentBuilding = null;
-                    }
+                    mineMenuCommanContolling3();
+
                     break;
                 }
                 case 4: {
 //                    mine info menu
-                    if (input == 401) {
-                        //mine /storage /defensiveWeapon overall info
-                        if (currentBuilding != null) {
-                            view.overAllInfoShower(currentBuilding.getLevel(), currentBuilding.getResistance());
-                        } else {
-                            if (currentDefensiveWeapon != null) {
-                                view.overAllInfoShower(currentDefensiveWeapon.getLevel(), currentDefensiveWeapon.getResistence());
-                            } else System.err.println("BUG!!!!!!  no building is selected");
-                        }
-                    }
-                    if (input == 402) {
-//                        upgradeInfo for mine storage defensive weapon
-                        if (currentBuilding != null) {
-                            view.upgradeInfoShower(currentBuilding.getCostOfUpgrade());
-                        } else if (currentDefensiveWeapon != null) {
-                            view.upgradeInfoShower(currentDefensiveWeapon.getCOST_OF_UPGRADE());
-                        } else {
-                            System.err.println("BUG!!!!!!");
-                        }
-                    }
-                    if (input == 404) {
-//                        upgrade for mine building defensive weapon
-                        if (currentBuilding != null) {
-                            view.wantUpgradeNameForCostGolds(currentBuilding.getJasonType(), currentBuilding.getCostOfUpgrade()[0]);
-                        } else if (currentDefensiveWeapon != null) {
-                            view.wantUpgradeNameForCostGolds(currentDefensiveWeapon.getARM_TYPE(), currentDefensiveWeapon.getCOST_OF_UPGRADE()[0]);
-                        } else {
-                            System.err.println("BUG!!!!!!");
-                        }
-                    }
+                    mineInfoMenuCommandControlling4();
                     break;
                 }
                 case 6: {
 //                    storage info menu
-                    if (input == 603) {
-//                        source info in storage
-                        int r = currentBuilding.getJasonType();
-                        if (r == 3) {
-//                            gold
-                            view.yourSourceStorageGoldIsSourceCapacity(world.currentGame.getGoldAndElixirStorageAndCapacity());
-                        } else {
-                            view.yourSourceStorageforElixirIsSourceCapacity(world.currentGame.getGoldAndElixirStorageAndCapacity());
-                        }
-                    }
+                    storageInfoMenuCommanControlling6();
                     break;
                 }
                 case 7: {
@@ -207,104 +71,25 @@ public class Controller {
                 }
                 break;
                 case 9: {
-                    if (input == 901) {
-//                        yes to upgrade
-                        int r = 10;
-                        if (currentBuilding != null) {
-                            r = world.currentGame.upgradeOwnBuilding(currentBuilding);
-                        } else {
-                            if (currentDefensiveWeapon != null) {
-                                r = world.currentGame.upgradeOwnDefensiveBuilding(currentDefensiveWeapon);
-                            } else System.err.println("BUG!!!!");
-                        }
-                        if (r == -1) {
-                            view.dontHaveEnoughResource();
-                        }
-                        if (r == 0) {
-                            System.err.println("upgraded successfully and now your resource is :");
-                            view.shoeResources(world.currentGame.getOwnResources(), world.currentGame.getOwnScore()); //to test
-                        }
-                        if (r == -2) {
-                            System.err.println("you have to upgrade town hall first!");
-                        }
-                        endToUprating();
-                    }
-                    if (input == 902) {
-//                        no to upgrade
-                        endToUprating();
-                    }
+                    upgradingCommandControlling9();
                     break;
                 }
                 case 10: {
 //                    barrack menu
-                    if (input == 1002) {
-//                        building soldiers
-                        view.buildingSoldierBarrack(world.currentGame.getPotentialSoldiers(currentBarrack));
-                        view.setUpWaitingToRecieveType();
-                    }
-                    if (input == 1003) {
-//                      status of barrack
-                        view.barrackStatusShower(world.currentGame.getQueueOfSoldiers(currentBarrack));
-                    }
-                    if (input == 1004) {
-//                        back
-                        currentBarrack = null;
-                    }
+                    barrackMenuCommandControlling10();
                     break;
                 }
                 case 11: {
-                    if (input == 1101) {
-//                       upgrade barrack
-                        if (currentBarrack != null) {
-                            currentBuilding = currentBarrack;
-                            view.wantUpgradeNameForCostGolds(currentBarrack.getJasonType(), currentBarrack.getCostOfUpgrade()[0]);
-                        } else {
-                            System.err.println("BUG!!!!!!");
-                        }
-                    }
-                    if (input == 1102) {
-//                        overall info of barrack
-                        if (currentBarrack != null) {
-                            view.overAllInfoShower(currentBarrack.getLevel(), currentBarrack.getResistance());
-                        } else System.err.println("no barrack is set : BUG");
-                    }
-                    if (input == 1103) {
-//                        upgrade info
-                        if (currentBarrack != null) {
-                            view.upgradeInfoShower(currentBarrack.getCostOfUpgrade());
-                        }
-                    }
+                    barracksInfoMenuCommandControlling11();
                     break;
                 }
                 case 12: {
 //                    camp menu
-                    if (input == 1202) {
-//                        soldiers
-                        view.showCampSoldiers(world.currentGame.getSoldiersOfCamps());
-                    }
-                    if (input == 1203) {
-//                        back
-                        currentCamp = null;
-                    }
+                    campMenuCommandControlling12();
                     break;
                 }
                 case 13: {
-                    if (input == 1301) {
-//                        overall info of camp
-                        view.overAllInfoShower(currentCamp.getLevel(), currentCamp.getResistance());
-                    }
-                    if (input == 1302) {
-//                        upgrade info
-                        if (currentCamp != null) {
-                            view.upgradeInfoShower(currentCamp.getCostOfUpgrade());
-                        } else
-                            System.err.println("Bug");
-                    }
-                    if (input == 1303) {
-//                        capacity info
-                        int[] r = world.currentGame.getSoldiersAndCapacityOfCamps();
-                        view.printCampsCapacity(r[0], r[1]);
-                    }
+                    campInfoMenuControlling13();
                     break;
                 }
                 case 14: {
@@ -321,49 +106,16 @@ public class Controller {
                 }
                 case 15: {
 //                    map menu
-                    if (input == 1501) {
-//                        map info
-                        int gold = world.currentEnemy.getResources().get("gold");
-                        int elixir = world.currentEnemy.getResources().get("elixir");
-                        view.showEnemyMapInfo(gold, elixir, world.currentEnemy.getBuildings());
-                    }
-                    if(input == 1503){
-                        view.setUpMapMenu2002();
-                        view.currentMenuType = Menu.MAP_MENU ;
-                    }
+                    mapMenuCommandController15();
                     break;
                 }
                 case 16: {
-                    if (input == 1601) {
-//                        load map
-                        String mapAddress = view.getCommand();
-                        int r = world.loadEnemyMap(mapAddress);
-                        if (r == -1)
-                            view.thereIsNoValidFile();
-                        if (r != -1) {
-                            view.currentMenuType = Menu.ATTACK_MENU;
-                        }
-                        view.setUpAttackMenu2000(world.getEnemyMaps());
-                    }
+                    loadMapControlling16();
                     break;
                 }
                 case 17: {
 //                    attack map window
-                    if (input == 1701) {
-                        Pattern selectUnitTypeNum = Pattern.compile("Select ([A-Z][a-z]+)\\s*(\\d*)");
-                        String selection = view.getCommand();
-                        Matcher matcher = selectUnitTypeNum.matcher(selection);
-                        if (matcher.find()) {
-                            int[] r = new int[2];
-                            r[0] = view.soldierTypeRecognizer(matcher.group(1));
-                            r[1] = Integer.parseInt(matcher.group(2));
-                            if (world.currentGame.selectUnit(r) == 1)
-                                view.notEnoughUnits(r[0]);
-                        }
-                    }
-                    if (input == 1702) {
-                        view.printMap(world.currentEnemy);
-                    }
+                    attackMapWindowControlling17();
                     break;
                 }
                 case 18: {
@@ -372,78 +124,24 @@ public class Controller {
                 }
 
                 case 20: {
-                    if (input == 2002) {
-//                      available buildings
-                        view.setUpAvailableBuildingsMenue32();
-                        ArrayList<Integer> r = world.currentGame.availableBuildingsAndDefensiveWeapons();
-                        if (r != null) {
-                            view.buildingShowByType(r);
-                        }
-                    }
-                    if (input == 2003) {
-//                        status
-                        view.townHallStatusShower(world.currentGame.getQueueOfBuildingsAndDefensiveWeaponsToBEBuilt());
-                    }
+                    townHallMenuCommandControlling20();
                     break;
                 }
                 case 21: {
 //                    townHall info menu
-                    if (input == 2101) {
-//                        upgrade townHall
-                        int r = world.currentGame.upgradeTownHall();
-                        if (r == -1) {
-                            view.dontHaveEnoughResource();
-                        }
-                    }
-                    if (input == 2102) {
-//                  overall info
-                        view.overAllInfoShower(world.currentGame.getOwnTownHall().getLevel(), world.currentGame.getOwnTownHall().getResistance());
-                    }
-                    if (input == 2103) {
-//                        upgrade info
-                        view.upgradeInfoShower(world.currentGame.getOwnTownHall().getCostOfUpgrade());
-                    }
+                    townHallInfoMenuCommandControlling21();
+                    break;
                 }
                 case 22: {
-                    if (input >= 2201 && input <= 2211) {
-//                        building or defensive weapon
-                        int r = world.currentGame.constructionRequest(input - 2200);//check if it is true please!!!
-
-                        if (r == -2)
-                            view.dontHaveWorker();
-                        if (r == 0) {
-                            view.setUpConstructionBuildingMenue6(input - 2200, world.currentGame.getCostOfConstruction(input - 2200)[0]);
-                            currentBuildingTypeToBeBuilt = input - 2200;
-                        }
-                    }
+                    selectingBuildingCommandControlling22();
                     break;
                 }
                 case 23: {
-                    if (input >= 2301 && input <= 2306) {
-                        currentSoldierTypeToBeBuilt = input - 2300;
-                        int r = world.currentGame.checkePossibilityOfBuildingSoldierType(currentSoldierTypeToBeBuilt);
-                        if (r == 0) {
-                            view.setUpBuildSoldierWaitingToReceieveNum7();
-                        } else
-                            view.youCantBuildSoldier();
-                    }
+                    soldierTypeCommandControlling23();
                     break;
                 }
                 case 24: {
-                    if (input == 2402) {
-//                        no to construct
-                        currentBuildingTypeToBeBuilt = 0;
-                        view.setUpAvailableBuildingsMenue32();
-                        ArrayList<Integer> r = world.currentGame.availableBuildingsAndDefensiveWeapons();
-                        if (r != null) {
-                            view.buildingShowByType(r);
-                        }
-                    }
-                    if (input == 2401) {
-//                        yes to constructtod
-                        view.showOwnMap(world.currentGame.ownMap);
-                        view.setUpGetXY(currentBuildingTypeToBeBuilt);
-                    }
+                    constructionWindowCommandControlling24();
                     break;
                 }
                 case 25: {
@@ -455,26 +153,7 @@ public class Controller {
                     break;
                 }
                 case 26: {
-                    if (input == 2601) {
-                        Pattern xy = Pattern.compile("\\((\\d+) , (\\d+)\\)");
-                        Matcher matcher = xy.matcher(view.getCommand());
-                        if (matcher.find()) {
-                            int x = Integer.parseInt(matcher.group(1));
-                            int y = Integer.parseInt(matcher.group(2));
-                            int r = world.currentGame.newBuildingMaker(currentBuildingTypeToBeBuilt, x, y);
-
-                            if (r == -1) {
-                                view.youCantBuildInThisPosition();
-                            } else {
-                                currentBuildingTypeToBeBuilt = 0;
-                                view.setUpAvailableBuildingsMenue32();
-                                ArrayList<Integer> rr = world.currentGame.availableBuildingsAndDefensiveWeapons();
-                                if (rr != null) {
-                                    view.buildingShowByType(rr);
-                                }
-                            }
-                        }
-                    }
+                    positionCommandControlling26();
                 }
                 break;
                 case 27: {
@@ -497,6 +176,408 @@ public class Controller {
                 }
             }
             input = view.updateView();
+        }
+    }
+
+    private void soldierTypeCommandControlling23() {
+        if (input >= 2301 && input <= 2306) {
+            currentSoldierTypeToBeBuilt = input - 2300;
+            int r = world.currentGame.checkePossibilityOfBuildingSoldierType(currentSoldierTypeToBeBuilt);
+            if (r == 0) {
+                view.setUpBuildSoldierWaitingToReceieveNum7();
+            } else
+                view.youCantBuildSoldier();
+        }
+    }
+
+    private void mapMenuCommandController15() {
+        if (input == 1501) {
+//                        map info
+            int gold = world.currentEnemy.getResources().get("gold");
+            int elixir = world.currentEnemy.getResources().get("elixir");
+            view.showEnemyMapInfo(gold, elixir, world.currentEnemy.getBuildings());
+        }
+        if(input == 1503){
+            view.setUpMapMenu2002();
+            view.currentMenuType = Menu.MAP_MENU ;
+        }
+    }
+
+    private void positionCommandControlling26() {
+        if (input == 2601) {
+            Pattern xy = Pattern.compile("\\((\\d+) , (\\d+)\\)");
+            Matcher matcher = xy.matcher(view.getCommand());
+            if (matcher.find()) {
+                int x = Integer.parseInt(matcher.group(1));
+                int y = Integer.parseInt(matcher.group(2));
+                int r = world.currentGame.newBuildingMaker(currentBuildingTypeToBeBuilt, x, y);
+
+                if (r == -1) {
+                    view.youCantBuildInThisPosition();
+                } else {
+                    currentBuildingTypeToBeBuilt = 0;
+                    view.setUpAvailableBuildingsMenue32();
+                    ArrayList<Integer> rr = world.currentGame.availableBuildingsAndDefensiveWeapons();
+                    if (rr != null) {
+                        view.buildingShowByType(rr);
+                    }
+                }
+            }
+        }
+    }
+
+    private void constructionWindowCommandControlling24() {
+        if (input == 2402) {
+//                        no to construct
+            currentBuildingTypeToBeBuilt = 0;
+            view.setUpAvailableBuildingsMenue32();
+            ArrayList<Integer> r = world.currentGame.availableBuildingsAndDefensiveWeapons();
+            if (r != null) {
+                view.buildingShowByType(r);
+            }
+        }
+        if (input == 2401) {
+//                        yes to construct
+            view.showOwnMap(world.currentGame.ownMap);
+            view.setUpGetXY(currentBuildingTypeToBeBuilt);
+        }
+    }
+
+    private void selectingBuildingCommandControlling22() {
+        if (input >= 2201 && input <= 2211) {
+//                        building or defensive weapon
+            int r = world.currentGame.constructionRequest(input - 2200);//check if it is true please!!!
+
+            if (r == -2)
+                view.dontHaveWorker();
+            if (r == 0) {
+                view.setUpConstructionBuildingMenue6(input - 2200, world.currentGame.getCostOfConstruction(input - 2200)[0]);
+                currentBuildingTypeToBeBuilt = input - 2200;
+            }
+        }
+    }
+
+    private void townHallInfoMenuCommandControlling21() {
+        if (input == 2101) {
+//                        upgrade townHall
+            int r = world.currentGame.upgradeTownHall();
+            if (r == -1) {
+                view.dontHaveEnoughResource();
+            }
+        }
+        if (input == 2102) {
+//                  overall info
+            view.overAllInfoShower(world.currentGame.getOwnTownHall().getLevel(), world.currentGame.getOwnTownHall().getResistance());
+        }
+        if (input == 2103) {
+//                        upgrade info
+            view.upgradeInfoShower(world.currentGame.getOwnTownHall().getCostOfUpgrade());
+        }
+    }
+
+    private void townHallMenuCommandControlling20() {
+        if (input == 2002) {
+//                      available buildings
+            view.setUpAvailableBuildingsMenue32();
+            ArrayList<Integer> r = world.currentGame.availableBuildingsAndDefensiveWeapons();
+            if (r != null) {
+                view.buildingShowByType(r);
+            }
+        }
+        if (input == 2003) {
+//                        status
+            view.townHallStatusShower(world.currentGame.getQueueOfBuildingsAndDefensiveWeaponsToBEBuilt());
+        }
+    }
+
+    private void attackMapWindowControlling17() {
+        if (input == 1701) {
+            Pattern selectUnitTypeNum = Pattern.compile("Select ([A-Z][a-z]+)\\s*(\\d*)");
+            String selection = view.getCommand();
+            Matcher matcher = selectUnitTypeNum.matcher(selection);
+            if (matcher.find()) {
+                int[] r = new int[2];
+                r[0] = view.soldierTypeRecognizer(matcher.group(1));
+                r[1] = Integer.parseInt(matcher.group(2));
+                if (world.currentGame.selectUnit(r) == 1)
+                    view.notEnoughUnits(r[0]);
+            }
+        }
+        if (input == 1702) {
+            view.printMap(world.currentEnemy);
+        }
+    }
+
+    private void loadMapControlling16() {
+        if (input == 1601) {
+//                        load map
+            String mapAddress = view.getCommand();
+            int r = world.loadEnemyMap(mapAddress);
+            if (r == -1)
+                view.thereIsNoValidFile();
+            if (r != -1) {
+                view.currentMenuType = Menu.ATTACK_MENU;
+            }
+            view.setUpAttackMenu2000(world.getEnemyMaps());
+        }
+        return;
+    }
+
+    private void campInfoMenuControlling13() {
+        if (input == 1301) {
+//                        overall info of camp
+            view.overAllInfoShower(currentCamp.getLevel(), currentCamp.getResistance());
+        }
+        if (input == 1302) {
+//                        upgrade info
+            if (currentCamp != null) {
+                view.upgradeInfoShower(currentCamp.getCostOfUpgrade());
+            } else
+                System.err.println("Bug");
+        }
+        if (input == 1303) {
+//                        capacity info
+            int[] r = world.currentGame.getSoldiersAndCapacityOfCamps();
+            view.printCampsCapacity(r[0], r[1]);
+        }
+    }
+
+    private void campMenuCommandControlling12() {
+        if (input == 1202) {
+//                        soldiers
+            view.showCampSoldiers(world.currentGame.getSoldiersOfCamps());
+        }
+        if (input == 1203) {
+//                        back
+            currentCamp = null;
+        }
+    }
+
+    private void barracksInfoMenuCommandControlling11() {
+        if (input == 1101) {
+//                       upgrade barrack
+            if (currentBarrack != null) {
+                currentBuilding = currentBarrack;
+                view.wantUpgradeNameForCostGolds(currentBarrack.getJasonType(), currentBarrack.getCostOfUpgrade()[0]);
+            } else {
+                System.err.println("BUG!!!!!!");
+            }
+        }
+        if (input == 1102) {
+//                        overall info of barrack
+            if (currentBarrack != null) {
+                view.overAllInfoShower(currentBarrack.getLevel(), currentBarrack.getResistance());
+            } else System.err.println("no barrack is set : BUG");
+        }
+        if (input == 1103) {
+//                        upgrade info
+            if (currentBarrack != null) {
+                view.upgradeInfoShower(currentBarrack.getCostOfUpgrade());
+            }
+        }
+    }
+
+    private void barrackMenuCommandControlling10() {
+        if (input == 1002) {
+//                        building soldiers
+            view.buildingSoldierBarrack(world.currentGame.getPotentialSoldiers(currentBarrack));
+            view.setUpWaitingToRecieveType();
+        }
+        if (input == 1003) {
+//                      status of barrack
+            view.barrackStatusShower(world.currentGame.getQueueOfSoldiers(currentBarrack));
+        }
+        if (input == 1004) {
+//                        back
+            currentBarrack = null;
+        }
+    }
+
+    private void upgradingCommandControlling9() {
+        if (input == 901) {
+//                        yes to upgrade
+            int r = 10;
+            if (currentBuilding != null) {
+                r = world.currentGame.upgradeOwnBuilding(currentBuilding);
+            } else {
+                if (currentDefensiveWeapon != null) {
+                    r = world.currentGame.upgradeOwnDefensiveBuilding(currentDefensiveWeapon);
+                } else System.err.println("BUG!!!!");
+            }
+            if (r == -1) {
+                view.dontHaveEnoughResource();
+            }
+            if (r == 0) {
+                System.err.println("upgraded successfully and now your resource is :");
+                view.shoeResources(world.currentGame.getOwnResources(), world.currentGame.getOwnScore()); //to test
+            }
+            if (r == -2) {
+                System.err.println("you have to upgrade town hall first!");
+            }
+            endToUprating();
+        }
+        if (input == 902) {
+//                        no to upgrade
+            endToUprating();
+        }
+    }
+
+    private void storageInfoMenuCommanControlling6() {
+        if (input == 603) {
+//                        source info in storage
+            int r = currentBuilding.getJasonType();
+            if (r == 3) {
+//                            gold
+                view.yourSourceStorageGoldIsSourceCapacity(world.currentGame.getGoldAndElixirStorageAndCapacity());
+            } else {
+                view.yourSourceStorageforElixirIsSourceCapacity(world.currentGame.getGoldAndElixirStorageAndCapacity());
+            }
+        }
+    }
+
+    private void mineInfoMenuCommandControlling4() {
+        if (input == 401) {
+            //mine /storage /defensiveWeapon overall info
+            if (currentBuilding != null) {
+                view.overAllInfoShower(currentBuilding.getLevel(), currentBuilding.getResistance());
+            } else {
+                if (currentDefensiveWeapon != null) {
+                    view.overAllInfoShower(currentDefensiveWeapon.getLevel(), currentDefensiveWeapon.getResistence());
+                } else System.err.println("BUG!!!!!!  no building is selected");
+            }
+        }
+        if (input == 402) {
+//                        upgradeInfo for mine storage defensive weapon
+            if (currentBuilding != null) {
+                view.upgradeInfoShower(currentBuilding.getCostOfUpgrade());
+            } else if (currentDefensiveWeapon != null) {
+                view.upgradeInfoShower(currentDefensiveWeapon.getCOST_OF_UPGRADE());
+            } else {
+                System.err.println("BUG!!!!!!");
+            }
+        }
+        if (input == 404) {
+//                        upgrade for mine building defensive weapon
+            if (currentBuilding != null) {
+                view.wantUpgradeNameForCostGolds(currentBuilding.getJasonType(), currentBuilding.getCostOfUpgrade()[0]);
+            } else if (currentDefensiveWeapon != null) {
+                view.wantUpgradeNameForCostGolds(currentDefensiveWeapon.getARM_TYPE(), currentDefensiveWeapon.getCOST_OF_UPGRADE()[0]);
+            } else {
+                System.err.println("BUG!!!!!!");
+            }
+        }
+    }
+
+    private void mineMenuCommanContolling3() {
+        //                    301 -->info
+        if (input == 302) {
+            if (currentBuilding.getJasonType() == 1) {
+                GoldMine temp = (GoldMine) currentBuilding;
+                view.printMine(temp.getGoldProduce());
+            } else {
+                ElixirMine temp = (ElixirMine) currentBuilding;
+                view.printMine(temp.getElixirProduce());
+            }
+        }
+        if (input == 303) {
+//                        back
+            currentBuilding = null;
+        }
+    }
+
+    private void villageMenuCommandControlling2() {
+        if (input == 201) {
+//                        attack
+            view.currentMenuType = Menu.ATTACK_MENU;
+            view.setUpAttackMenu2000(world.getEnemyMaps());
+        }
+        if (input == 202) {
+//                        show buildings
+            for (Building b : world.currentGame.getOwnMap().getBuildings()) {
+                view.buildingShowerTypeID(b.getJasonType(), b.getId());
+            }
+            if (world.currentGame.getOwnDefensiveWeapon() != null) {
+                for (DefensiveWeapon d : world.currentGame.getOwnDefensiveWeapon()) {
+                    view.buildingShowerTypeID(d.getARM_TYPE(), d.getId());
+                }
+            }
+        }
+        if (input == 203) {
+//                        resources
+            view.shoeResources(world.currentGame.getOwnResources(), world.currentGame.getOwnScore());
+        }
+        if (input >= 204 && input <= 207) {
+            //a type building is selected
+            currentBuilding = world.currentGame.findBuildingTypeInOwnMap(input - 203, IDrecognizer(currentCommand));
+            if (currentBuilding == null) {
+                view.noSuchBuilding();
+                view.setUpVillageMenu();
+            } else {
+                if (input == 204 || input == 205) {
+                    //mine
+                    view.setUpMineMenu();
+                } else view.setUpStorageMenu();
+            }
+        }
+//                    208 -->mainHall
+        if (input == 209) {
+//                        barrack selected
+            //  if (currentBuilding.getClass().getName().equals("Barracks")) {
+            currentBarrack = (Barracks) world.currentGame.findBuildingTypeInOwnMap(input - 203, IDrecognizer(currentCommand));
+            if (currentBarrack == null) {
+                view.noSuchBuilding();
+                view.setUpVillageMenu();
+            } else view.setUpBarracksMenu4();
+        }
+        if (input == 210) {
+//                        camp selected
+            currentCamp = (Camp) world.currentGame.findBuildingTypeInOwnMap(input - 203, IDrecognizer(currentCommand));
+            if (currentCamp == null) {
+                view.noSuchBuilding();
+                view.setUpVillageMenu();
+            } else view.setUpCampMenu8();
+        }
+        if (input >= 211 && input <= 214) {
+//                        defensive Weapon selected
+            currentDefensiveWeapon = world.currentGame.findDefensiveWeaponTypeInOwnMap(input - 203, IDrecognizer(currentCommand));
+            if (currentDefensiveWeapon == null) {
+                view.noSuchBuilding();
+                view.setUpVillageMenu();
+            } else
+                view.setUpDefensiveWeaponMenu12();
+        }
+    }
+
+    private void initialMenuCommandControlling1() {
+        if (input == 101) {
+            world.newGameMaker();
+            view.setUpVillageMenu();
+        }
+        if (input == 102) {
+            //loadGame
+            Pattern loadAddress = Pattern.compile("load (.*)");
+            Matcher matcher = loadAddress.matcher(view.getCommand());
+//                        load game
+            if (matcher.find()) {
+                this.world = world.loadGame(matcher.group(1), view);
+                if (world.games.size() > 0) {
+                    this.world.currentGame = world.games.get(0);
+                }
+            }
+        }
+    }
+
+    private void onlineCommandsControlling() {
+        if (input == 1) {
+            String temp[] = view.getCommand().split(" ");
+            world.currentGame.turnTimeOwnMap(Integer.parseInt(temp[1]));
+        }
+        if (input == 2) {
+            Pattern saveAddress = Pattern.compile("save (.*)");
+            Matcher matcher = saveAddress.matcher(view.getCommand());
+            if (matcher.find()) {
+                world.saveGame(matcher.group(1), world);
+            }
         }
     }
 
