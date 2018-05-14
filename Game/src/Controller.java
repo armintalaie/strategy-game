@@ -367,24 +367,8 @@ public class Controller {
                     break;
                 }
                 case 18: {
-//                    put soldiers on map window
-                    if (input == 1801) {
-                        Pattern putUnit = Pattern.compile("Put ([A-Z][a-z]+)\\s*(\\d+) in (\\d+),(\\d+)");
-                        Matcher matcher = putUnit.matcher(view.getCommand());
-                        if (matcher.find()) {
-                            if (world.currentEnemy.getMap()[Integer.parseInt(matcher.group(3))][Integer.parseInt(matcher.group(4))].isEmpty()) {
-                                int r = world.currentGame.putSoldier(view.soldierTypeRecognizer(matcher.group(1)),
-                                        Integer.parseInt(matcher.group(2)),
-                                        Integer.parseInt(matcher.group(3)),
-                                        Integer.parseInt(matcher.group(4)), world.currentEnemy);
-                                if (r == 1)
-                                    view.invalidPut();
-                                if (r == -1)
-                                    System.err.println("invalid put");
-                            } else
-                                view.invalidPut();
-                        }
-                    }
+                    putSoldiersInMap();
+                    break;
                 }
 
                 case 20: {
@@ -501,105 +485,14 @@ public class Controller {
                 }
                 break;
                 case 30: {
-                    EnemyMap enemyMap = world.currentEnemy;
-                    Game currentGame = world.currentGame;
-                    for (Person person : currentGame.getOwnMap().valuableSoldiers)
-                        if (person.getType() != 6 && person.getInEnemyMap()) {
-                            int[] target = person.operate(enemyMap);
-                            if (target != null)
-                                hitEnemyBuilding(target, enemyMap);
-                            updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
-                        }
-                    for (DefensiveWeapon defensiveWeapon : enemyMap.getDefensiveWeapons()) {
-                        int target[] = defensiveWeapon.attack(currentGame.getOwnMap().valuableSoldiers);
-                        if (target[0] != -1) {
-                            if (defensiveWeapon.getARM_TYPE() == 9 || defensiveWeapon.getARM_TYPE() == 11)
-                                groupHit(target, currentGame.getOwnMap().valuableSoldiers, enemyMap.getSize()[0]);
-                            else
-                                singleHit(target, currentGame.getOwnMap().valuableSoldiers);
-                        }
-                        updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+                    if(input == 3008){
+                        int number =Integer.parseInt(view.getCommand().split(" ")[1]);
+                        for(int num = 0 ; num < number; num++)
+                            attackMap(1);
                     }
-                    if (gameFinished(enemyMap, currentGame)) {
-                        input = 3007;
-                    }
+                    else
+                        attackMap(0);
 
-                    if (input == 3001) {
-                        view.statusResourcesOfEnemy(world.currentGame.statusResourcesOfEnemy(enemyMap));
-                    }
-                    if (input == 3002) {
-                        //done
-                        Pattern statusUnitUnitType = Pattern.compile("status unit ([A-Z][a-z]+)");
-                        Matcher matcher = statusUnitUnitType.matcher(view.getCommand());
-                        int r;
-                        if (matcher.find()) {
-                            r = view.soldierTypeRecognizer(matcher.group(1));
-                            view.statusUnitPrint(world.currentGame.statusUnitAttackMode(r));
-                        }
-                    }
-                    if (input == 3003) {
-//                       done
-                        view.statusUnitPrint(world.currentGame.statusUnitsAttackMode());
-                    }
-                    if (input == 3004) {
-                        Pattern statusTowerType = Pattern.compile("status tower (.*[a-z]+)");
-                        Matcher matcher = statusTowerType.matcher(view.getCommand());
-                        int r;
-                        if (matcher.find()) {
-                            r = view.buildingRecognizer(matcher.group(1));
-                            if (r >= 8) {
-//                            defensiveWeapon
-                                view.statusDefensiveWeapon(world.currentGame.statusDefensiveWeaponAttackMode(r, enemyMap));
-                            } else view.statusBuilding(world.currentGame.statusBuildingAttackMode(r, enemyMap));
-                        }
-                    }
-                    if (input == 3005) {
-//                        status towers
-                        view.statusBuilding(world.currentGame.statusBuildingsAttackMode(enemyMap));
-                        view.statusDefensiveWeapon(world.currentGame.statusDefensiveWeaponsAttackMode(enemyMap));
-                    }
-                    if (input == 3006) {
-//                        status all
-//                        statusUnits
-                        view.statusUnitPrint(world.currentGame.statusUnitsAttackMode());
-//                        status towers
-                        view.statusBuilding(world.currentGame.statusBuildingsAttackMode(enemyMap));
-                        view.statusDefensiveWeapon(world.currentGame.statusDefensiveWeaponsAttackMode(enemyMap));
-                    }
-                    if (input == 3007) {
-                        view.currentMenuType = Menu.VILLAGE_MENU;
-                        view.endGame(currentGame);
-                        world.currentGame.finishGame();
-                    }
-                    if (input == 3008) {
-                        int time = Integer.parseInt(view.getCommand().split(" ")[1]);
-
-                        if (timeAttack == time) {
-                            input = 3009;
-                            timeAttack = 0;
-                        }
-                        if (timeAttack < time) {
-                            timeAttack++;
-                            continue;
-                        }
-                    }
-                    if(input == 11){
-                        Pattern putUnit = Pattern.compile("Put ([A-Z][a-z]+)\\s*(\\d+) in (\\d+),(\\d+)");
-                        Matcher matcher = putUnit.matcher(view.getCommand());
-                        if (matcher.find()) {
-                            if (world.currentEnemy.getMap()[Integer.parseInt(matcher.group(3))][Integer.parseInt(matcher.group(4))].isEmpty()) {
-                                int r = world.currentGame.putSoldier(view.soldierTypeRecognizer(matcher.group(1)),
-                                        Integer.parseInt(matcher.group(2)),
-                                        Integer.parseInt(matcher.group(3)),
-                                        Integer.parseInt(matcher.group(4)), world.currentEnemy);
-                                if (r == 1)
-                                    view.invalidPut();
-                                if (r == -1)
-                                    System.err.println("invalid put");
-                            } else
-                                view.invalidPut();
-                        }
-                    }
                     break;
                 }
             }
@@ -747,12 +640,15 @@ public class Controller {
     private boolean gameFinished(EnemyMap enemyMap, Game game) {
         if (game.ownMap.valuableSoldiers.size() == 0)
             return true;
-        for (Person person : game.ownMap.valuableSoldiers) {
-            if (!person.getInEnemyMap()) {
-                view.warn();
-                return true;
-            }
+        int num = 0;
+        for (Person person : game.ownMap.valuableSoldiers)
+            if (person.getInEnemyMap())
+                num++;
+        if(num == 0){
+            view.warn();
+            return true;
         }
+
         if (enemyMap.getMapBuildings().size() == 0 && enemyMap.getDefensiveWeapons().size() == 0)
             return true;
         return false;
@@ -760,5 +656,129 @@ public class Controller {
 
     private void empty(EnemyMap enemyMap, int x, int y) {
         enemyMap.getMap()[x][y].setEmpty(true);
+    }
+
+    private void attackMap (int num){
+        EnemyMap enemyMap = world.currentEnemy;
+        Game currentGame = world.currentGame;
+
+        soldiersAttack(currentGame , enemyMap);
+        defensiveBuildingsAttack(currentGame , enemyMap);
+
+        if (gameFinished(enemyMap, currentGame))
+            endAttack(currentGame);
+
+        if(num == 0){
+            switch (input){
+                case 3001:
+                    view.statusResourcesOfEnemy(world.currentGame.statusResourcesOfEnemy(enemyMap));
+                    break;
+                case 3002:
+                    unitTypeStatus();
+                    break;
+                case 3003:
+                    view.statusUnitPrint(world.currentGame.statusUnitsAttackMode());
+                    break;
+                case 3004:
+                    towerTypeStatus(enemyMap);
+                    break;
+                case 3005:
+                    statusTowers(enemyMap);
+                    break;
+                case 3006:
+                    statusAll(enemyMap);
+                    break;
+                case 3007:
+                    endAttack(currentGame);
+                    break;
+                case 3011:
+                    putSoldiersInMap();
+                    break;
+            }
+    }
+    }
+
+    private void putSoldiersInMap (){
+        Pattern putUnit = Pattern.compile("Put ([A-Z][a-z]+)\\s*(\\d+) in (\\d+),(\\d+)");
+        Matcher matcher = putUnit.matcher(view.getCommand());
+        if (matcher.find()) {
+            if (world.currentEnemy.getMap()[Integer.parseInt(matcher.group(3))][Integer.parseInt(matcher.group(4))].isEmpty()) {
+                int r = world.currentGame.putSoldier(view.soldierTypeRecognizer(matcher.group(1)),
+                        Integer.parseInt(matcher.group(2)),
+                        Integer.parseInt(matcher.group(3)),
+                        Integer.parseInt(matcher.group(4)), world.currentEnemy);
+                if (r == 1)
+                    view.invalidPut();
+                if (r == -1)
+                    System.err.println("invalid put");
+            } else
+                view.invalidPut();
+        }
+
+    }
+    private void endAttack (Game currentGame){
+        view.currentMenuType = Menu.VILLAGE_MENU;
+        view.endGame(currentGame);
+        world.currentGame.finishGame();
+        view.showVillageMenu();
+
+    }
+    private void unitTypeStatus (){
+        Pattern statusUnitUnitType = Pattern.compile("status unit ([A-Z][a-z]+)");
+        Matcher matcher = statusUnitUnitType.matcher(view.getCommand());
+        int r;
+        if (matcher.find()) {
+            r = view.soldierTypeRecognizer(matcher.group(1));
+            view.statusUnitPrint(world.currentGame.statusUnitAttackMode(r));
+        }
+
+    }
+    private void statusAll (EnemyMap enemyMap) {
+        statusTowers(enemyMap);
+        statusUnits();
+
+    }
+    private void statusTowers (EnemyMap enemyMap){
+        view.statusBuilding(world.currentGame.statusBuildingsAttackMode(enemyMap));
+        view.statusDefensiveWeapon(world.currentGame.statusDefensiveWeaponsAttackMode(enemyMap));
+    }
+    private void statusUnits (){
+        view.statusUnitPrint(world.currentGame.statusUnitsAttackMode());
+
+    }
+    private void towerTypeStatus (EnemyMap enemyMap){
+        Pattern statusTowerType = Pattern.compile("status tower (.*[a-z]+)");
+        Matcher matcher = statusTowerType.matcher(view.getCommand());
+        int r;
+        if (matcher.find()) {
+            r = view.buildingRecognizer(matcher.group(1));
+            if (r >= 8) {
+                view.statusDefensiveWeapon(world.currentGame.statusDefensiveWeaponAttackMode(r, enemyMap));
+            } else view.statusBuilding(world.currentGame.statusBuildingAttackMode(r, enemyMap));
+        }
+
+    }
+    private void soldiersAttack (Game currentGame , EnemyMap enemyMap){
+        for (Person person : currentGame.getOwnMap().valuableSoldiers)
+            if (person.getType() != 6 && person.getInEnemyMap()) {
+                int[] target = person.operate(enemyMap);
+                if (target != null)
+                    hitEnemyBuilding(target, enemyMap);
+                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+            }
+    }
+
+    private void defensiveBuildingsAttack (Game currentGame , EnemyMap enemyMap){
+        for (DefensiveWeapon defensiveWeapon : enemyMap.getDefensiveWeapons()) {
+            int target[] = defensiveWeapon.attack(currentGame.getOwnMap().valuableSoldiers);
+            if (target[0] != -1) {
+                if (defensiveWeapon.getARM_TYPE() == 9 || defensiveWeapon.getARM_TYPE() == 11)
+                    groupHit(target, currentGame.getOwnMap().valuableSoldiers, enemyMap.getSize()[0]);
+                else
+                    singleHit(target, currentGame.getOwnMap().valuableSoldiers);
+            }
+            updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+        }
+
     }
 }

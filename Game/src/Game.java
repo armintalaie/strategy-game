@@ -654,6 +654,7 @@ public class Game {
                 ownMap.valuableSoldiers.get(indexPrime).setInEnemyMap(true);
                 num++;
             }
+            System.out.println(num);
         return 0;
     }
 

@@ -597,7 +597,7 @@ public class View {
         }
         if(Pattern.matches("", command))
             return 10;
-        if (Pattern.matches("turn\\d+", command))
+        if (Pattern.matches("turn \\d+", command))
             return 8;
         if (Pattern.matches("Put [A-z][a-z]+\\s*\\d+ in \\d+,\\d+", command))
             return 11;
