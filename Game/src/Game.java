@@ -589,7 +589,7 @@ public class Game {
 
     public ArrayList<Building> statusBuildingsAttackMode(EnemyMap enemyMap) {
         ArrayList<Building> buildings = new ArrayList<>();
-        for (int index = 0; index < enemyMap.getDefensiveWeapons().size(); index++)
+        for (int index = 0; index < enemyMap.getMapBuildings().size(); index++)
             buildings.add(enemyMap.getMapBuildings().get(index));
         return buildings;
     }
@@ -617,6 +617,7 @@ public class Game {
 
         for (int index = 0, num = 0; index < ownMap.soldiers.size() && num < unitTypeNum[1]; index++)
             if (ownMap.soldiers.get(index).getType() == unitTypeNum[0]) {
+                System.out.println("added soldier");
                 ownMap.valuableSoldiers.add(ownMap.soldiers.get(index));
                 num++;
             }
@@ -685,9 +686,8 @@ public class Game {
         }
 
         for (int index = 0; index < ownMap.soldiers.size(); index++) {
-
             if (ownMap.soldiers.get(index).getHealth() <= 0) {
-                ownMap.valuableSoldiers.remove(index);
+                ownMap.soldiers.remove(index);
             }
         }
         addResources(getWonGold(), getWonElixir());

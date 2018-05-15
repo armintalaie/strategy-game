@@ -79,7 +79,6 @@ public class World {
             world1.games.get(0).ownMap.buildings.clear();
             world1.games.get(0).ownMap.soldiers.clear();
             world1.games.get(0).ownMap.defensiveWeapons.clear();
-
             world1.games.get(0).ownMap.buildings.add(world1.games.get(0).ownMap.mainBuilding);
             world1.games.get(0).ownMap.buildings.addAll(world1.games.get(0).ownMap.goldStorages);
             world1.games.get(0).ownMap.buildings.addAll(world1.games.get(0).ownMap.elixirStorages);

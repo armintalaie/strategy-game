@@ -167,7 +167,8 @@ public class Controller {
                     if (input == 3008) {
                         int number = Integer.parseInt(view.getCommand().split(" ")[1]);
                         for (int num = 0; num < number; num++)
-                            attackMap(1);
+                            if(1 == attackMap(1))
+                                break;
                     } else
                         attackMap(0);
 
@@ -739,15 +740,17 @@ public class Controller {
         enemyMap.getMap()[x][y].setEmpty(true);
     }
 
-    private void attackMap(int num) {
+    private int attackMap(int num) {
         EnemyMap enemyMap = world.currentEnemy;
         Game currentGame = world.currentGame;
 
         soldiersAttack(currentGame, enemyMap);
         defensiveBuildingsAttack(currentGame, enemyMap);
 
-        if (gameFinished(enemyMap, currentGame))
+        if (gameFinished(enemyMap, currentGame)){
             endAttack(currentGame);
+            return 1;
+        }
 
         if (num == 0) {
             switch (input) {
@@ -771,12 +774,13 @@ public class Controller {
                     break;
                 case 3007:
                     endAttack(currentGame);
-                    break;
+                    return 1;
                 case 3011:
                     putSoldiersInMap();
                     break;
             }
         }
+        return 0;
     }
 
     private void putSoldiersInMap() {
@@ -802,7 +806,7 @@ public class Controller {
         view.currentMenuType = Menu.VILLAGE_MENU;
         view.endGame(currentGame);
         world.currentGame.finishGame();
-        view.showVillageMenu();
+        //view.showVillageMenu();
 
     }
 

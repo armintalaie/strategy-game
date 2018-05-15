@@ -1185,10 +1185,18 @@ public class View {
         }
     }
 
-    public void statusUnitPrint(ArrayList<Person> units) {
+    public void statusUnitPrint(ArrayList<Person> units ) {
+        System.out.println("soldiers currently in enemy map");
         for (Person p : units) {
+            if(p.inEnemyMap)
             System.out.println(convertSoldierTypeToString(p.getType()) + " level = " + p.getLevel() + " in(" + p.getCurrentPosition()[0] + "," + p.getCurrentPosition()[1]
                     + ") with health = " + p.getHealth());
+        }
+        System.out.println("soldiers currently NOT in enemy map");
+        for (Person p : units) {
+            if(!p.inEnemyMap)
+                System.out.println(convertSoldierTypeToString(p.getType()) + " level = " + p.getLevel() + " in(" + p.getCurrentPosition()[0] + "," + p.getCurrentPosition()[1]
+                        + ") with health = " + p.getHealth());
         }
     }
 
@@ -1196,7 +1204,7 @@ public class View {
         for (Building building : buildings) {
             System.out.print(singleBuildingShowerByType(building.getJasonType())+ " level = " + building.getLevel() + " in ");
             System.out.print("(" + building.getPosition()[0] + "," + building.getPosition()[1] + ") ");
-            System.out.print("with health = " + building.getHealth() + "\n");
+            System.out.print("with health = " + building.getResistance() + "\n");
         }
     }
 

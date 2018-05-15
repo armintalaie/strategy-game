@@ -13,7 +13,6 @@ class DefensiveWeapon {
     protected int id;
     protected int[] position = new int[2];
     protected int[] target = new int[4];
-
     public DefensiveWeapon() {
     }
 
