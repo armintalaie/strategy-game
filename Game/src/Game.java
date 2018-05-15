@@ -243,39 +243,39 @@ public class Game {
 
         switch (type) {
             case 1: {
-                costOfUpgrade[0] = 150;
-                costOfUpgrade[1] = 5;
+                costOfUpgrade[0] = 100;
+                costOfUpgrade[1] = 0;
             }
             break;
 
             case 2: {
                 costOfUpgrade[0] = 100;
-                costOfUpgrade[1] = 3;
+                costOfUpgrade[1] = 0;
             }
             break;
 
             case 3: {
-                costOfUpgrade[0] = 200;
+                costOfUpgrade[0] = 100;
                 costOfUpgrade[1] = 0;
             }
             break;
             case 4: {
-                costOfUpgrade[0] = 200;
+                costOfUpgrade[0] = 100;
                 costOfUpgrade[1] = 0;
             }
             break;
             case 5: {
-                costOfUpgrade[0] = 200;
+                costOfUpgrade[0] = 500;
                 costOfUpgrade[1] = 0;
             }
             break;
             case 6: {
-                costOfUpgrade[0] = 200;
+                costOfUpgrade[0] = 100;
                 costOfUpgrade[1] = 0;
             }
             break;
             case 7: {
-                costOfUpgrade[0] = 200;
+                costOfUpgrade[0] = 0;
                 costOfUpgrade[1] = 0;
             }
             break;
@@ -662,6 +662,7 @@ public class Game {
         if (getOwnResources()[0] >= ownMap.getMainBuilding().getCostOfUpgrade()[0]) {
             ownMap.addToQueueOfUpgrade(5, 0);
             ownMap.mainBuilding.reduceFreeWorker();
+
             int availableGold = getOwnResources()[0] - ownMap.mainBuilding.getCostOfUpgrade()[0];
             for (int i = 0; i < ownMap.getGoldStorages().size(); i++) {
                 ownMap.getGoldStorages().get(i).setGoldStored(0);
@@ -684,7 +685,7 @@ public class Game {
         }
 
         for (int index = 0; index < ownMap.soldiers.size(); index++) {
-            System.out.println(ownMap.soldiers.size());
+
             if (ownMap.soldiers.get(index).getHealth() <= 0) {
                 ownMap.valuableSoldiers.remove(index);
             }

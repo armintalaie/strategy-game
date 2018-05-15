@@ -82,7 +82,7 @@ class GoldMine extends Building {
         this.costOfUpgrade[1] = 0;
         this.destructionScore = 2;
         this.resistance = 200;
-        this.timeOfConstruction = 0;
+        this.timeOfConstruction = 300;
         this.position[0] = x;
         this.position[1] = y;
         this.level = 0;
@@ -163,7 +163,7 @@ class GoldStorage extends Building {
         this.costOfUpgrade[1] = 0;
         this.destructionScore = 3;
         this.resistance = 300;
-        this.timeOfConstruction = 0;
+        this.timeOfConstruction = 200;
         this.position[0] = x;
         this.position[1] = y;
         this.level = 0;
@@ -223,7 +223,7 @@ class ElixirStorage extends Building {
         this.costOfUpgrade[1] = 0;
         this.destructionScore = 3;
         this.resistance = 300;
-        this.timeOfConstruction = 0;
+        this.timeOfConstruction = 100;
         this.position[0] = x;
         this.position[1] = y;
         this.level = 0;
@@ -282,6 +282,8 @@ class MainBuilding extends Building {
         this.costOfUpgrade[0] = 500;
         this.costOfUpgrade[1] = 0;
         this.destructionScore = 8;
+        this.resourcesForAttacker[0] = 10000;
+        this.resourcesForAttacker[1] = 500;
         this.resistance = 1000;
         this.timeOfConstruction = 100;
         this.position[0] = 14;
@@ -465,8 +467,6 @@ class Camp extends Building {
         this.costOfConstruction[0] = 200;
         this.costOfConstruction[1] = 0;
         this.resourcesForAttacker = costOfConstruction.clone();
-        this.costOfUpgrade[0] = 200;
-        this.costOfUpgrade[1] = 0;
         this.destructionScore = 1;
         this.resistance = 900;
         this.timeOfConstruction = 100;

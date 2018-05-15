@@ -50,7 +50,6 @@ class Map {
             newWaiter[2] = t + timeForConstruction.get(type);
             getQueueOfBuildingsToBeUpgraded.add(newWaiter);
         }
-        System.out.println("added");
     }
 
     public void updateQueueOfUpgrade() {
@@ -434,6 +433,7 @@ class EnemyMap {
         }
         createBuildings();
     }
+
     private void createBuildings() {
         for (EnemyBuilding enemyBuilding : buildings) {
             int X = enemyBuilding.getX();
@@ -441,7 +441,7 @@ class EnemyMap {
             switch (enemyBuilding.getType()) {
                 case 1: {
                     GoldMine goldMine = new GoldMine(X, Y, 0);
-                    for(  ; goldMine.getLevel() < enemyBuilding.getLevel() ;)
+                    for (; goldMine.getLevel() < enemyBuilding.getLevel(); )
                         goldMine.upgrade();
                     MapBuildings.add(goldMine);
 
@@ -450,14 +450,14 @@ class EnemyMap {
                 case 2: {
                     ElixirMine elixirMine = new ElixirMine(X, Y, 0);
                     MapBuildings.add(elixirMine);
-                    for(  ; elixirMine.getLevel() < enemyBuilding.getLevel() ;)
+                    for (; elixirMine.getLevel() < enemyBuilding.getLevel(); )
                         elixirMine.upgrade();
                     break;
                 }
                 case 3: {
                     GoldStorage goldStorage = new GoldStorage(X, Y, 0);
                     goldStorage.addGold(enemyBuilding.getAmount());
-                    for(  ; goldStorage.getLevel() < enemyBuilding.getLevel() ;)
+                    for (; goldStorage.getLevel() < enemyBuilding.getLevel(); )
                         goldStorage.upgrade();
                     MapBuildings.add(goldStorage);
                     break;
@@ -465,54 +465,54 @@ class EnemyMap {
                 case 4: {
                     ElixirStorage elixirStorage = new ElixirStorage(X, Y, 0);
                     elixirStorage.addElixir(enemyBuilding.getAmount());
-                    for(  ; elixirStorage.getLevel() < enemyBuilding.getLevel() ;)
+                    for (; elixirStorage.getLevel() < enemyBuilding.getLevel(); )
                         elixirStorage.upgrade();
                     MapBuildings.add(elixirStorage);
                     break;
                 }
                 case 5: {
                     MainBuilding mainBuilding = new MainBuilding();
-                    for(  ; mainBuilding.getLevel() < enemyBuilding.getLevel() ;)
+                    for (; mainBuilding.getLevel() < enemyBuilding.getLevel(); )
                         mainBuilding.upgrade();
                     MapBuildings.add(mainBuilding);
                     break;
                 }
                 case 6: {
                     Barracks barracks = new Barracks(X, Y, 0);
-                    for(  ; barracks.getLevel() < enemyBuilding.getLevel() ;)
-                    MapBuildings.add(barracks);
+                    for (; barracks.getLevel() < enemyBuilding.getLevel(); )
+                        MapBuildings.add(barracks);
                 }
                 case 7: {
                     Camp camp = new Camp(X, Y, 0);
-                    for(  ; camp.getLevel() < enemyBuilding.getLevel() ;)
+                    for (; camp.getLevel() < enemyBuilding.getLevel(); )
                         camp.upgrade();
                     MapBuildings.add(camp);
                     break;
                 }
                 case 8: {
                     ArcherTower archerTower = new ArcherTower(X, Y, 0);
-                    for(  ; archerTower.getLevel() < enemyBuilding.getLevel() ;)
+                    for (; archerTower.getLevel() < enemyBuilding.getLevel(); )
                         archerTower.upgrade();
                     defensiveWeapons.add(archerTower);
                     break;
                 }
                 case 9: {
                     Cannon cannon = new Cannon(X, Y, 0);
-                    for(  ; cannon.getLevel() < enemyBuilding.getLevel() ;)
+                    for (; cannon.getLevel() < enemyBuilding.getLevel(); )
                         cannon.upgrade();
                     defensiveWeapons.add(cannon);
                     break;
                 }
                 case 10: {
                     AirDefense airDefense = new AirDefense(X, Y, 0);
-                    for(  ; airDefense.getLevel() < enemyBuilding.getLevel() ;)
+                    for (; airDefense.getLevel() < enemyBuilding.getLevel(); )
                         airDefense.upgrade();
                     defensiveWeapons.add(airDefense);
                     break;
                 }
                 case 11: {
                     WizardTower wizardTower = new WizardTower(X, Y, 0);
-                    for(  ; wizardTower.getLevel() < enemyBuilding.getLevel() ;)
+                    for (; wizardTower.getLevel() < enemyBuilding.getLevel(); )
                         wizardTower.upgrade();
                     defensiveWeapons.add(wizardTower);
                     break;

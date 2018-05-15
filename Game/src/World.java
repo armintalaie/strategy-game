@@ -21,7 +21,7 @@ public class World {
     public void addEnemyMap(EnemyMap enemyMap) {
         if (enemyMap != null) {
             if (enemyMap.getName() == null)
-                enemyMap.setName("unknown enemy map " + Integer.toString(maps.size() + 1));
+                enemyMap.setName("enemy map " + Integer.toString(maps.size() + 1));
         }
         enemyMaps.add(enemyMap);
     }
