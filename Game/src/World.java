@@ -98,6 +98,8 @@ public class World {
             world1.games.get(0).ownMap.soldiers.addAll(world1.games.get(0).ownMap.dragons);
             world1.games.get(0).ownMap.soldiers.addAll(world1.games.get(0).ownMap.archers);
 
+
+
             v.setUpVillageMenu();
             return world1;
         } catch (IOException e) {

@@ -94,7 +94,7 @@ public class Controller {
                 }
                 case 14: {
 //                    attack menu
-                    if (input==1400){
+                    if (input == 1400) {
                         view.setUpAttackMenu2000(world.getEnemyMaps());
                     }
                     if (input == 1402) {
@@ -164,12 +164,11 @@ public class Controller {
                 }
                 break;
                 case 30: {
-                    if(input == 3008){
-                        int number =Integer.parseInt(view.getCommand().split(" ")[1]);
-                        for(int num = 0 ; num < number; num++)
+                    if (input == 3008) {
+                        int number = Integer.parseInt(view.getCommand().split(" ")[1]);
+                        for (int num = 0; num < number; num++)
                             attackMap(1);
-                    }
-                    else
+                    } else
                         attackMap(0);
 
                     break;
@@ -197,9 +196,9 @@ public class Controller {
             int elixir = world.currentEnemy.getResources().get("elixir");
             view.showEnemyMapInfo(gold, elixir, world.currentEnemy.getBuildings());
         }
-        if(input == 1503){
+        if (input == 1503) {
             view.setUpMapMenu2002();
-            view.currentMenuType = Menu.MAP_MENU ;
+            view.currentMenuType = Menu.MAP_MENU;
         }
     }
 
@@ -686,14 +685,15 @@ public class Controller {
 
     private void updateAttackMap(ArrayList<Person> soldiers, EnemyMap enemyMap, Map map, Game game) {
         for (int index = 0; index < soldiers.size(); index++)
-            if (soldiers.get(index).getHealth() <= 0){
-                for(int indexPrime = 0 ; indexPrime < game.getOwnMap().soldiers.size() ; indexPrime++)
-                    if(game.getOwnMap().soldiers.get(indexPrime).getType() == soldiers.get(index).getType()) {
+            if (soldiers.get(index).getHealth() <= 0) {
+                for (int indexPrime = 0; indexPrime < game.getOwnMap().soldiers.size(); indexPrime++)
+                    if (game.getOwnMap().soldiers.get(indexPrime).getType() == soldiers.get(index).getType()) {
+                        removeFromCamp(game, game.getOwnMap().soldiers.get(indexPrime).getType());
                         game.getOwnMap().soldiers.remove(indexPrime);
                         break;
                     }
                 soldiers.remove(index);
-        }
+            }
         for (int index = 0; index < enemyMap.getMapBuildings().size(); index++)
             if (enemyMap.getMapBuildings().get(index).getResistance() <= 0) {
                 if (enemyMap.getMapBuildings().get(index).getJasonType() == 3) {
@@ -725,7 +725,7 @@ public class Controller {
         for (Person person : game.ownMap.valuableSoldiers)
             if (person.getInEnemyMap())
                 num++;
-        if(num == 0){
+        if (num == 0) {
             view.warn();
             return true;
         }
@@ -739,18 +739,18 @@ public class Controller {
         enemyMap.getMap()[x][y].setEmpty(true);
     }
 
-    private void attackMap (int num){
+    private void attackMap(int num) {
         EnemyMap enemyMap = world.currentEnemy;
         Game currentGame = world.currentGame;
 
-        soldiersAttack(currentGame , enemyMap);
-        defensiveBuildingsAttack(currentGame , enemyMap);
+        soldiersAttack(currentGame, enemyMap);
+        defensiveBuildingsAttack(currentGame, enemyMap);
 
         if (gameFinished(enemyMap, currentGame))
             endAttack(currentGame);
 
-        if(num == 0){
-            switch (input){
+        if (num == 0) {
+            switch (input) {
                 case 3001:
                     view.statusResourcesOfEnemy(world.currentGame.statusResourcesOfEnemy(enemyMap));
                     break;
@@ -776,10 +776,10 @@ public class Controller {
                     putSoldiersInMap();
                     break;
             }
-    }
+        }
     }
 
-    private void putSoldiersInMap (){
+    private void putSoldiersInMap() {
         Pattern putUnit = Pattern.compile("Put ([A-Z][a-z]+)\\s*(\\d+) in (\\d+),(\\d+)");
         Matcher matcher = putUnit.matcher(view.getCommand());
         if (matcher.find()) {
@@ -797,14 +797,16 @@ public class Controller {
         }
 
     }
-    private void endAttack (Game currentGame){
+
+    private void endAttack(Game currentGame) {
         view.currentMenuType = Menu.VILLAGE_MENU;
         view.endGame(currentGame);
         world.currentGame.finishGame();
         view.showVillageMenu();
 
     }
-    private void unitTypeStatus (){
+
+    private void unitTypeStatus() {
         Pattern statusUnitUnitType = Pattern.compile("status unit ([A-Z][a-z]+)");
         Matcher matcher = statusUnitUnitType.matcher(view.getCommand());
         int r;
@@ -814,20 +816,24 @@ public class Controller {
         }
 
     }
-    private void statusAll (EnemyMap enemyMap) {
+
+    private void statusAll(EnemyMap enemyMap) {
         statusTowers(enemyMap);
         statusUnits();
 
     }
-    private void statusTowers (EnemyMap enemyMap){
+
+    private void statusTowers(EnemyMap enemyMap) {
         view.statusBuilding(world.currentGame.statusBuildingsAttackMode(enemyMap));
         view.statusDefensiveWeapon(world.currentGame.statusDefensiveWeaponsAttackMode(enemyMap));
     }
-    private void statusUnits (){
+
+    private void statusUnits() {
         view.statusUnitPrint(world.currentGame.statusUnitsAttackMode());
 
     }
-    private void towerTypeStatus (EnemyMap enemyMap){
+
+    private void towerTypeStatus(EnemyMap enemyMap) {
         Pattern statusTowerType = Pattern.compile("status tower (.*[a-z]+)");
         Matcher matcher = statusTowerType.matcher(view.getCommand());
         int r;
@@ -839,7 +845,8 @@ public class Controller {
         }
 
     }
-    private void soldiersAttack (Game currentGame , EnemyMap enemyMap){
+
+    private void soldiersAttack(Game currentGame, EnemyMap enemyMap) {
         for (Person person : currentGame.getOwnMap().valuableSoldiers)
             if (person.getType() != 6 && person.getInEnemyMap()) {
                 int[] target = person.operate(enemyMap);
@@ -849,7 +856,7 @@ public class Controller {
             }
     }
 
-    private void defensiveBuildingsAttack (Game currentGame , EnemyMap enemyMap){
+    private void defensiveBuildingsAttack(Game currentGame, EnemyMap enemyMap) {
         for (DefensiveWeapon defensiveWeapon : enemyMap.getDefensiveWeapons()) {
             int target[] = defensiveWeapon.attack(currentGame.getOwnMap().valuableSoldiers);
             if (target[0] != -1) {
@@ -859,6 +866,17 @@ public class Controller {
                     singleHit(target, currentGame.getOwnMap().valuableSoldiers);
             }
             updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+        }
+
+    }
+
+    private void removeFromCamp(Game game, int type) {
+        for (int index = 0, i = 0; index < game.ownMap.camps.size(); index++) {
+            for (int indexprime = 0; index < game.ownMap.camps.get(index).getCampUnits().size(); indexprime++)
+                if (game.ownMap.camps.get(index).getCampUnits().get(indexprime).getType() == type) {
+                    game.ownMap.camps.get(index).getCampUnits().remove(indexprime);
+                    return;
+                }
         }
 
     }

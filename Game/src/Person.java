@@ -28,7 +28,15 @@ class Person {
     }
 
     int[] findPath(EnemyMap map) {
-        return null;
+        if(type == 1)
+            return new Guardian().findPath(map);
+        if(type == 2)
+            return new Giant().findPath(map);
+        if(type == 3)
+            return new Dragon().findPath(map);
+        if(type == 4)
+            return new Archer().findPath(map);
+        return new int[] {0,0};
     }
 
     int[] attack(int[] target, EnemyMap map) {

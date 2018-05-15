@@ -423,7 +423,6 @@ class EnemyMap {
     public void initializeMap() {
         map = new Cell[this.size[0]][this.size[1]];
 
-
         for (int i = 0; i < this.size[0]; i++)
             for (int j = 0; j < this.size[1]; j++)
                 map[i][j] = new Cell();
@@ -435,6 +434,8 @@ class EnemyMap {
     }
 
     private void createBuildings() {
+        MapBuildings.clear();
+        defensiveWeapons.clear();
         for (EnemyBuilding enemyBuilding : buildings) {
             int X = enemyBuilding.getX();
             int Y = enemyBuilding.getY();
@@ -539,51 +540,16 @@ class EnemyMap {
         return size;
     }
 
-    public void setSize(int[] size) {
-        this.size = size;
-    }
 
-    public EnemyMap withSize(int[] size) {
-        this.size = size;
-        return this;
-    }
-
-    public List<Wall> getWalls() {
-        return walls;
-    }
-
-    public void setWalls(List<Wall> walls) {
-        this.walls = walls;
-    }
-
-    public EnemyMap withWalls(List<Wall> walls) {
-        this.walls = walls;
-        return this;
-    }
 
     public HashMap<String, Integer> getResources() {
         return resources;
     }
 
-    public void setResources(HashMap<String, Integer> resources) {
-        this.resources = resources;
-    }
-
-    public EnemyMap withResources(HashMap<String, Integer> resources) {
-        this.resources = resources;
-        return this;
-    }
 
     public List<EnemyBuilding> getBuildings() {
         return buildings;
     }
 
-    public void setBuildings(List<EnemyBuilding> buildings) {
-        this.buildings = buildings;
-    }
 
-    public EnemyMap withBuildings(List<EnemyBuilding> buildings) {
-        this.buildings = buildings;
-        return this;
-    }
 }
