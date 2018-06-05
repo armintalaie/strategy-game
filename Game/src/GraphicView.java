@@ -62,6 +62,7 @@ public class GraphicView extends Application {
         stage.setTitle(VILLAGE_MENU);
     }
     public void setUpshowBuildingMenuScene(){
+        updateBuildingList();
         stage.setScene(showBuildingMenuScene);
         stage.setTitle(SHOW_BUILDINGS);
 }
@@ -193,10 +194,22 @@ public class GraphicView extends Application {
             }
         });
         VBox showBuildingsComponent = new VBox();
+        Button backB1 = new Button(BACK);
+        buildingList.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        showBuildingsComponent.getChildren().addAll(buildingList,backB1);
+        backB1.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpVillageMenuScene();
+            }
+        });
+        showBuildingsComponent.setSpacing(SPACING);
+        showBuildingsComponent.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        showBuildingMenuScene = new Scene(showBuildingsComponent);
         showBuildingsB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                buildingItems.clear();
+
                 for (Building b : world.currentGame.getOwnMap().getBuildings()) {
                     view.buildingShowerTypeID(b.getJasonType(), b.getId());
                 }
@@ -205,73 +218,165 @@ public class GraphicView extends Application {
                         view.buildingShowerTypeID(d.getARM_TYPE(), d.getId());
                     }
                 }
-                for (Building b : world.currentGame.getOwnMap().getBuildings()) {
-                    Button button = new Button(convertTypeToBuilding(b.getJasonType()) + " " +b.getId() );
-                    buildingItems.add(button);
-                    button.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent event) {
 
-                            switch (b.getJasonType()){
-                                case 1:{
-                                    currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
-                                    setUpMineMenuScene();
-                                }break;
-                                case 2:{
-                                    currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
-                                    setUpMineMenuScene();
-                                }break;
-                                case 3:{
-                                    currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
-                                    setUpStorageMenuScene();
-                                }break;
-                                case 4:{
-                                    currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
-                                    setUpStorageMenuScene();
-                                }break;
-                                case 6:{
-                                    currentBarrack = (Barracks) world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
-                                    setUpBarracksMenuScene();
-                                }break;
-                                case 7:{
-                                    currentCamp = (Camp) world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
-                                    setUpCampMenuScene();
-                                }break;
-                            }
-                        }
-                    });
-                }
-                if (world.currentGame.getOwnDefensiveWeapon() != null) {
-                    for (DefensiveWeapon d : world.currentGame.getOwnDefensiveWeapon()) {
-                        Button button = new Button(convertTypeToBuilding(d.getARM_TYPE() ) + " " + d.getId());
-                        buildingItems.add(button);
-                        button.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                            @Override
-                            public void handle(MouseEvent event) {
-                                currentDefensiveWeapon = world.currentGame.findDefensiveWeaponTypeInOwnMap(d.getARM_TYPE() , d.getId());
-                                setUpDefensiveWeaponMenuScene();
-                            }
-                        });
-                    }
-                }
-                Button backB1 = new Button(BACK);
-                buildingList.setItems(buildingItems);
-                showBuildingsComponent.getChildren().addAll(buildingList,backB1);
-                backB1.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        setUpVillageMenuScene();
-                    }
-                });
-                showBuildingsComponent.setSpacing(SPACING);
-                showBuildingsComponent.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-                showBuildingMenuScene = new Scene(showBuildingsComponent);
                 setUpshowBuildingMenuScene();
             }
         });
+//        mine menu
+        Button mineInfoB =  new Button(INFO);
+        Button mineB = new Button(MINE);
+        Button backB2 = new Button(BACK);
+        VBox mineMenuComponents = new VBox(SPACING , mineInfoB , mineB ,backB2);
+        mineMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        mineMenuScene  = new Scene(mineMenuComponents);
+        backB2.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                currentBuilding = null;
+                setUpshowBuildingMenuScene();
+            }
+        });
+        mineInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpMineInfoMenuScene();
+            }
+        });
+        mineB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (currentBuilding.getJasonType() == 1) {
+                    GoldMine temp = (GoldMine) currentBuilding;
+                    view.printMine(temp.getGoldProduce());
+                } else {
+                    ElixirMine temp = (ElixirMine) currentBuilding;
+                    view.printMine(temp.getElixirProduce());
+                }
+                // TODO: 6/5/2018
+            }
+        });
+//        mine info menu
+        Button overAllInfoB = new Button(OVERALL_INFO);
+        Button upgradeInfoB = new Button(UPGRADE_INFO);
+        Button upgradeB = new Button(UPGRADE);
+        Button mineInfoBack = new Button(BACK);
+        VBox mineInfoComponents = new VBox(SPACING,overAllInfoB,upgradeInfoB,upgradeB ,mineInfoBack);
+        mineInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        mineInfoMenuScene = new Scene(mineInfoComponents);
+        overAllInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                //mine /storage /defensiveWeapon overall info
+                if (currentBuilding != null) {
+                    view.overAllInfoShower(currentBuilding.getLevel(), currentBuilding.getResistance());
+                } else {
+                    if (currentDefensiveWeapon != null) {
+                        view.overAllInfoShower(currentDefensiveWeapon.getLevel(), currentDefensiveWeapon.getResistence());
+                    } else System.err.println("BUG!!!!!!  no building is selected");
+                }
+                // TODO: 6/5/2018
+            }
+        });
+        upgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                //                        upgradeInfo for mine storage defensive weapon
+                if (currentBuilding != null) {
+                    view.upgradeInfoShower(currentBuilding.getCostOfUpgrade());
+                } else if (currentDefensiveWeapon != null) {
+                    view.upgradeInfoShower(currentDefensiveWeapon.getCOST_OF_UPGRADE());
+                } else {
+                    System.err.println("BUG!!!!!!");
+                }
+                // TODO: 6/5/2018
+            }
+        });
+        upgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+//                upgrade for mine building defensive weapon
+                if (currentBuilding != null) {
+                    view.wantUpgradeNameForCostGolds(currentBuilding.getJasonType(), currentBuilding.getCostOfUpgrade()[0]);
+                } else if (currentDefensiveWeapon != null) {
+                    view.wantUpgradeNameForCostGolds(currentDefensiveWeapon.getARM_TYPE(), currentDefensiveWeapon.getCOST_OF_UPGRADE()[0]);
+                } else {
+                    System.err.println("BUG!!!!!!");
+                }
+            }
+        });
+        mineInfoBack.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpMineMenuScene();
+            }
+        });
+//        storage menu
+        Button storageInfoB = new Button(INFO);
+        VBox storageMenuComponents = new VBox(storageInfoB ,backB2);
+        storageMenuScene = new Scene(storageMenuComponents);
+        storageInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpStorageInfoMenuScene();
+            }
+        });
+
         setUpInitialMenuScene();
         stage.show();
     }//end of start
+    public void updateBuildingList(){
+        buildingItems.clear();
+        for (Building b : world.currentGame.getOwnMap().getBuildings()) {
+            Button button = new Button(convertTypeToBuilding(b.getJasonType()) + " " +b.getId() );
+            buildingItems.add(button);
+            button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+
+                    switch (b.getJasonType()){
+                        case 1:{
+                            currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpMineMenuScene();
+                        }break;
+                        case 2:{
+                            currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpMineMenuScene();
+                        }break;
+                        case 3:{
+                            currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpStorageMenuScene();
+                        }break;
+                        case 4:{
+                            currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpStorageMenuScene();
+                        }break;
+                        case 6:{
+                            currentBarrack = (Barracks) world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpBarracksMenuScene();
+                        }break;
+                        case 7:{
+                            currentCamp = (Camp) world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpCampMenuScene();
+                        }break;
+                    }
+                }
+            });
+        }
+        if (world.currentGame.getOwnDefensiveWeapon() != null) {
+            for (DefensiveWeapon d : world.currentGame.getOwnDefensiveWeapon()) {
+                Button button = new Button(convertTypeToBuilding(d.getARM_TYPE() ) + " " + d.getId());
+                buildingItems.add(button);
+                button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        currentDefensiveWeapon = world.currentGame.findDefensiveWeaponTypeInOwnMap(d.getARM_TYPE() , d.getId());
+                        setUpDefensiveWeaponMenuScene();
+                    }
+                });
+            }
+        }
+        buildingList.setItems(buildingItems);
+    }
     public String convertTypeToBuilding(int type) {
         switch (type) {
             case 1:

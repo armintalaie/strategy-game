@@ -31,11 +31,11 @@ public class ConstantStrings {
     public static final String SHOW_BUILDINGS = "Buildings";
     public static final String RESOURCES = "Resources";
     public static final String  BACK = "Back";
-//    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
+    public static final String  INFO = "Info";
+    public static final String  MINE = "Mine";
+    public static final String OVERALL_INFO = "Overall Info";
+    public static final String UPGRADE_INFO = "Upgrade Info";
+    public static final String UPGRADE = "Upgrade";
 //    public static final String
 //    public static final String
 //    public static final String
