@@ -1,8 +1,11 @@
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -28,7 +31,7 @@ public class GraphicView extends Application {
     int timeAttack = 0;
 
 //    graphics
-    Stage stage;
+    Stage stage = new Stage();
     Scene initialMenuScene;
     Scene villageMenuScene;
     Scene showBuildingMenuScene;
@@ -46,6 +49,8 @@ public class GraphicView extends Application {
     Scene barracksInfoMenuScene;
     Scene campMenuScene;
     Scene campInfoMenuScene;
+    ListView<Button> buildingList = new ListView<>();
+    ObservableList<Button> buildingItems = FXCollections.observableArrayList ();
 
     public void setUpInitialMenuScene() {
         stage.setScene(initialMenuScene);
@@ -134,7 +139,7 @@ public class GraphicView extends Application {
 
 
     public static void main(String[] args) {
-        launch(args);
+        Application.launch(args);
     }
 
     @Override
@@ -149,7 +154,7 @@ public class GraphicView extends Application {
             @Override
             public void handle(MouseEvent event) {
                 world.newGameMaker();
-                stage.setScene(villageMenuScene);
+                setUpVillageMenuScene();
             }
         });
         loadButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -180,6 +185,7 @@ public class GraphicView extends Application {
         Button backB = new Button(BACK);
         VBox villageMenuComponents = new VBox(SPACING, showBuildingsB,resourcesB,attackB,backB);
         villageMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        villageMenuScene = new Scene(villageMenuComponents);
         attackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -190,6 +196,7 @@ public class GraphicView extends Application {
         showBuildingsB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                buildingItems.clear();
                 for (Building b : world.currentGame.getOwnMap().getBuildings()) {
                     view.buildingShowerTypeID(b.getJasonType(), b.getId());
                 }
@@ -199,8 +206,8 @@ public class GraphicView extends Application {
                     }
                 }
                 for (Building b : world.currentGame.getOwnMap().getBuildings()) {
-                    Button button = new Button(b.getJasonType() + " " +b.getId() );
-                    showBuildingsComponent.getChildren().add(button);
+                    Button button = new Button(convertTypeToBuilding(b.getJasonType()) + " " +b.getId() );
+                    buildingItems.add(button);
                     button.setOnMouseClicked(new EventHandler<MouseEvent>() {
                         @Override
                         public void handle(MouseEvent event) {
@@ -236,8 +243,8 @@ public class GraphicView extends Application {
                 }
                 if (world.currentGame.getOwnDefensiveWeapon() != null) {
                     for (DefensiveWeapon d : world.currentGame.getOwnDefensiveWeapon()) {
-                        Button button = new Button(d.getARM_TYPE() + " " + d.getId());
-                        showBuildingsComponent.getChildren().add(button);
+                        Button button = new Button(convertTypeToBuilding(d.getARM_TYPE() ) + " " + d.getId());
+                        buildingItems.add(button);
                         button.setOnMouseClicked(new EventHandler<MouseEvent>() {
                             @Override
                             public void handle(MouseEvent event) {
@@ -248,7 +255,8 @@ public class GraphicView extends Application {
                     }
                 }
                 Button backB1 = new Button(BACK);
-                showBuildingsComponent.getChildren().add(backB1);
+                buildingList.setItems(buildingItems);
+                showBuildingsComponent.getChildren().addAll(buildingList,backB1);
                 backB1.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
