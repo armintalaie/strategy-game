@@ -559,7 +559,7 @@ public class Controller {
             Matcher matcher = loadAddress.matcher(view.getCommand());
 //                        load game
             if (matcher.find()) {
-                this.world = world.loadGame(matcher.group(1), view);
+//                this.world = world.loadGame(matcher.group(1), view);
                 if (world.games.size() > 0) {
                     this.world.currentGame = world.games.get(0);
                 }

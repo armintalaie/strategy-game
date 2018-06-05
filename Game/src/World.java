@@ -70,7 +70,7 @@ public class World {
         return newGame;
     }
 
-    public World loadGame(String address, View v) {
+    public World loadGame(String address, GraphicView v) {
         try {
             String text = new String(Files.readAllBytes((Paths.get(address))), StandardCharsets.UTF_8);
             Gson gson = new Gson();
@@ -98,14 +98,15 @@ public class World {
             world1.games.get(0).ownMap.soldiers.addAll(world1.games.get(0).ownMap.archers);
 
 
-
-            v.setUpVillageMenu();
+            v.setUpVillageMenuScene();
+//            v.setUpVillageMenu();
             return world1;
         } catch (IOException e) {
             System.out.println("NO VALID FILE");
         }
         // returns -1 in case there is no valid address
-        v.setUpInitialMenu();
+        v.setUpInitialMenuScene();
+//        v.setUpInitialMenu();
         return this;
 //      currentGame must be initialize
     }
