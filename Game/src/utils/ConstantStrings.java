@@ -13,13 +13,26 @@ public class ConstantStrings {
     public static final String UPGRADE_MENU = "Upgrade Menu";
     public static final String TOWN_HALL_MENU = "Town Hall Menu";
     public static final String TOWN_HALL_INFO_MENU = "Town Hall Information Menu";
-    public static final String AVAILABLE_BUILDING_MENU = "Available Buildings";
+    public static final String AVAILABLE_BUILDINGS = "Available Buildings";
     public static final String BARRACKS_MENU = "Barracks Menu";
     public static final String BARRACKS_INFO_MENU = "Barracks Information Menu";
     public static final String CAMP_MENU = "Camp Menu";
     public static final String CAMP_INFO_MENU = "Camp Information Menu";
     public static final String ATTACK_MENU = "Attack Menu";
     public static final String BUILDING_SOLDIERS_MENU = "Building Soldiers";
+    public static final String TARGET_MAP_MENU = "Map Menu";
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
 
     public static final String  NEW_GAME = "New Game";
     public static final String LOAD_GAME = "Load Game";
@@ -42,10 +55,24 @@ public class ConstantStrings {
     public static final String BUILDING_SOLDIERS = "Building Soldiers";
     public static final String STATUS = "Status";
     public static final String SOLDIERS = "Soldiers";
+    public static final String CAPACITY_INFO = "Capacity Info";
+
+    public static final String LOAD_MAP = "Load Map";
+    public static final String AVAILABLE_MAPS = "Available Maps :";
+    public static final String MAP_INFO = "Map Info";
+    public static final String ATTACK_MAP = "Attack Map";
 //    public static final String
 //    public static final String
 //    public static final String
 //    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+    //    public static final String
 //    public static final String
 //    public static final String
 //    public static final String

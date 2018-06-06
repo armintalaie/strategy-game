@@ -5,6 +5,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseEvent;
@@ -12,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static utils.ConstantStrings.*;
@@ -49,8 +51,17 @@ public class GraphicView extends Application {
     Scene barracksInfoMenuScene;
     Scene campMenuScene;
     Scene campInfoMenuScene;
+    Scene attackMenuScene;
+    Scene targetMapMenuScene;
     ListView<Button> buildingList = new ListView<>();
     ObservableList<Button> buildingItems = FXCollections.observableArrayList ();
+
+    ListView<Button> availableBuildingList = new ListView<>();
+    ObservableList<Button> availableBuildingItems = FXCollections.observableArrayList ();
+
+    ListView<Button> attackMapsList = new ListView<>();
+    ObservableList<Button> attackMapItems = FXCollections.observableArrayList ();
+
 
     public void setUpInitialMenuScene() {
         stage.setScene(initialMenuScene);
@@ -112,8 +123,9 @@ public class GraphicView extends Application {
     }
 
     public void setUpAvailableBuildingMenuScene() {
+        updateAvailableBuildingList();
         stage.setScene(availableBuildingMenuScene);
-        stage.setTitle(AVAILABLE_BUILDING_MENU);
+        stage.setTitle(AVAILABLE_BUILDINGS);
     }
 
     public void setUpBarracksMenuScene() {
@@ -134,6 +146,17 @@ public class GraphicView extends Application {
     public void setUpCampInfoMenuScene() {
         stage.setScene(campInfoMenuScene);
         stage.setTitle(CAMP_INFO_MENU);
+    }
+
+    public void setUpAttackMenuScene() {
+        updateAttackMapsList();
+        stage.setScene(attackMenuScene);
+        stage.setTitle(ATTACK_MENU);
+    }
+
+    public void setUpTargetMapMenuScene() {
+        stage.setScene(targetMapMenuScene);
+        stage.setTitle(TARGET_MAP_MENU);
     }
 
     private static Button exitButton = new Button(EXIT);
@@ -190,9 +213,23 @@ public class GraphicView extends Application {
         attackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                // TODO: 6/5/2018
+                setUpAttackMenuScene();
             }
         });
+        resourcesB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                view.shoeResources(world.currentGame.getOwnResources(), world.currentGame.getOwnScore());
+            }
+        });
+        backB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpInitialMenuScene();
+                // TODO: 6/7/2018
+            }
+        });
+//        show buildings
         VBox showBuildingsComponent = new VBox();
         Button backB1 = new Button(BACK);
         buildingList.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
@@ -222,6 +259,7 @@ public class GraphicView extends Application {
                 setUpshowBuildingMenuScene();
             }
         });
+
 //        mine menu
         Button mineInfoB =  new Button(INFO);
         Button mineB = new Button(MINE);
@@ -312,7 +350,8 @@ public class GraphicView extends Application {
         });
 //        storage menu
         Button storageInfoB = new Button(INFO);
-        VBox storageMenuComponents = new VBox(storageInfoB ,backB2);
+        VBox storageMenuComponents = new VBox(SPACING,storageInfoB ,backB2);
+        storageMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         storageMenuScene = new Scene(storageMenuComponents);
         storageInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -500,8 +539,183 @@ public class GraphicView extends Application {
             }
         });
 //        camp info menu
-
-
+        Button campOverallInfoB = new Button(OVERALL_INFO);
+        Button campCapacityB = new Button(CAPACITY_INFO);
+        Button campUpgradeInfoB = new Button(UPGRADE_INFO);
+        Button campUpgradeB = new Button(UPGRADE);
+        Button campInfoBackB = new Button(BACK);
+        VBox campInfoComponents = new VBox(SPACING,campOverallInfoB,campCapacityB,campUpgradeInfoB,campUpgradeB,campInfoBackB);
+        campInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        campInfoMenuScene = new Scene(campInfoComponents);
+        campOverallInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                view.overAllInfoShower(currentCamp.getLevel(), currentCamp.getResistance());
+                // TODO: 6/6/2018  
+            }
+        });
+        campCapacityB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                int[] r = world.currentGame.getSoldiersAndCapacityOfCamps();
+                view.printCampsCapacity(r[0], r[1]);
+                // TODO: 6/6/2018  
+            }
+        });
+        campUpgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (currentCamp != null) {
+                    view.upgradeInfoShower(currentCamp.getCostOfUpgrade());
+                } else
+                    System.err.println("Bug");
+                // TODO: 6/6/2018  
+            }
+        });
+        campUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                // TODO: 6/6/2018  
+            }
+        });
+        campInfoBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpCampMenuScene();
+            }
+        });
+//        town hall menu
+        Button townHallInfo = new Button(INFO);
+        Button availableBuilding = new Button(AVAILABLE_BUILDINGS);
+        Button townHallStatus = new Button(STATUS);
+        Button townHallBackB = new Button(BACK);
+        VBox townHallComponents = new VBox(SPACING,townHallInfo,availableBuilding,townHallStatus,townHallBackB);
+        townHallComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        townHallMenuScene = new Scene(townHallComponents);
+        townHallInfo.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpTownHallInfoMenuScene();
+            }
+        });
+        availableBuilding.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                view.setUpAvailableBuildingsMenue32();
+//                ArrayList<Integer> r = world.currentGame.availableBuildingsAndDefensiveWeapons();
+//                if (r != null) {
+//                    view.buildingShowByType(r);
+//                }
+                // TODO: 6/6/2018
+                setUpAvailableBuildingMenuScene();
+            }
+        });
+        townHallStatus.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                view.townHallStatusShower(world.currentGame.getQueueOfBuildingsAndDefensiveWeaponsToBEBuilt());
+                // TODO: 6/6/2018
+            }
+        });
+        townHallBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpshowBuildingMenuScene();
+            }
+        });
+//        townHall info menu
+        Button townHallOverallInfoB = new Button(OVERALL_INFO);
+        Button townHallUpgradeInfoB = new Button(UPGRADE_INFO);
+        Button townHallUpgradeB = new Button(UPGRADE);
+        Button townHallInfoBackB = new Button(BACK);
+        VBox townHallInfoComponents = new VBox(SPACING,townHallOverallInfoB,townHallUpgradeInfoB,townHallUpgradeB,townHallInfoBackB);
+        townHallInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        townHallInfoMenuScene = new Scene(townHallInfoComponents);
+        townHallOverallInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                view.overAllInfoShower(world.currentGame.getOwnTownHall().getLevel(), world.currentGame.getOwnTownHall().getResistance());
+                // TODO: 6/6/2018
+            }
+        });
+        townHallUpgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                view.upgradeInfoShower(world.currentGame.getOwnTownHall().getCostOfUpgrade());
+                // TODO: 6/6/2018
+            }
+        });
+        townHallUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                int r = world.currentGame.upgradeTownHall();
+                if (r == -1) {
+                    view.dontHaveEnoughResource();
+                }
+                // TODO: 6/6/2018
+            }
+        });
+        townHallInfoBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpTownHallMenuScene();
+            }
+        });
+//        available buildings
+        availableBuildingList.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        VBox availableBuildingComponents = new VBox(SPACING,availableBuildingList,townHallInfoBackB);
+        availableBuildingComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        availableBuildingMenuScene = new Scene(availableBuildingComponents);
+//        attack menu
+        attackMapsList.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        Button loadMapB = new Button(LOAD_MAP);
+        Label availableMaps = new Label(AVAILABLE_MAPS);
+        Button attackBackB = new Button(BACK);
+        VBox attackMenuComponents = new VBox(SPACING,loadMapB,availableMaps,attackMapsList,attackBackB);
+        attackMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        attackMenuScene = new Scene(attackMenuComponents);
+        loadMapB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                // TODO: 6/7/2018  
+            }
+        });
+        attackBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpVillageMenuScene();
+            }
+        });
+//    target map menu
+        Button targetMapInfo = new Button(MAP_INFO);
+        Button attackMap = new Button(ATTACK_MAP);
+        Button targetMapBackB = new Button(BACK);
+        VBox targetMapMenuComponents = new VBox(SPACING,targetMapInfo,attackMap,targetMapBackB);
+        targetMapMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        targetMapMenuScene = new Scene(targetMapMenuComponents);
+        targetMapInfo.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                int gold = world.currentEnemy.getResources().get("gold");
+                int elixir = world.currentEnemy.getResources().get("elixir");
+                view.showEnemyMapInfo(gold, elixir, world.currentEnemy.getBuildings());
+                // TODO: 6/7/2018  
+            }
+        });
+        attackMap.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                // TODO: 6/7/2018  
+            }
+        });
+        targetMapBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                // TODO: 6/7/2018 ?????? 
+                world.currentEnemy = null; 
+                setUpAttackMenuScene();
+            }
+        });
 
 
         setUpInitialMenuScene();
@@ -534,6 +748,9 @@ public class GraphicView extends Application {
                             currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
                             setUpStorageMenuScene();
                         }break;
+                        case 5:{
+                            setUpTownHallMenuScene();
+                        }break;
                         case 6:{
                             currentBarrack = (Barracks) world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
                             setUpBarracksMenuScene();
@@ -560,6 +777,52 @@ public class GraphicView extends Application {
             }
         }
         buildingList.setItems(buildingItems);
+    }
+    public void updateAvailableBuildingList(){
+        availableBuildingItems.clear();
+        ArrayList<Integer> type = world.currentGame.availableBuildingsAndDefensiveWeapons();
+        if (type != null) {
+            for (int i = 0; i < type.size(); i++) {
+                int t = type.get(i);
+                System.out.println(convertTypeToBuilding(type.get(i)));
+                Button button = new Button(convertTypeToBuilding(type.get(i)));
+                availableBuildingItems.add(button);
+                button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        int r = world.currentGame.constructionRequest(t);//check if it is true please!!!
+
+                        if (r == -2)
+                            view.dontHaveWorker();
+                        if (r == 0) {
+                            view.setUpConstructionBuildingMenue6(t, world.currentGame.getCostOfConstruction(t)[0]);
+                            currentBuildingTypeToBeBuilt = t;
+                        }
+                        // TODO: 6/7/2018
+                    }
+                });
+            }//end of for
+        }//end of if
+        availableBuildingList.setItems(availableBuildingItems);
+    }
+    public void updateAttackMapsList(){
+        attackMapItems.clear();
+        if (world.getEnemyMaps() != null) {
+            for (int i = 0; i < world.getEnemyMaps().size(); i++) {
+                System.out.println(i + 2 + "." + world.getEnemyMaps().get(i).getName());
+                Button button = new Button(world.getEnemyMaps().get(i).getName());
+                int index = i;
+                attackMapItems.add(button);
+                button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        world.setEnemyMapToCurrentGame(index);
+                        // TODO: 6/7/2018
+                    }
+                });
+            }
+        }
+        attackMapsList.setItems(attackMapItems);
     }
     public String convertTypeToBuilding(int type) {
         switch (type) {
