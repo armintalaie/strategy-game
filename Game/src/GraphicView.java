@@ -320,10 +320,194 @@ public class GraphicView extends Application {
                 setUpStorageInfoMenuScene();
             }
         });
+//        storage info menu
+        Button sourceInfoB = new Button(SOURCES_INFO);
+        Button storageInfoBackB = new Button(BACK);
+        VBox storageInfoComponents = new VBox(SPACING,overAllInfoB,sourceInfoB,upgradeInfoB,upgradeB,storageInfoBackB);
+        storageInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        storageInfoMenuScene = new Scene(storageInfoComponents);
+        sourceInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                int r = currentBuilding.getJasonType();
+                if (r == 3) {
+//                            gold
+                    view.yourSourceStorageGoldIsSourceCapacity(world.currentGame.getGoldAndElixirStorageAndCapacity());
+                } else {
+                    view.yourSourceStorageforElixirIsSourceCapacity(world.currentGame.getGoldAndElixirStorageAndCapacity());
+                }
+                // TODO: 6/6/2018
+            }
+        });
+        storageInfoBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpStorageMenuScene();
+            }
+        });
+//        defensive weapon menu
+        Button defensiveInfoB = new Button(INFO);
+        Button targetB = new Button(TARGET);
+        Button back3 = new Button(BACK);
+        VBox defensiveComponents = new VBox(SPACING,defensiveInfoB,targetB,back3);
+        defensiveComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        defensiveWeaponMenuScene = new Scene(defensiveComponents);
+        defensiveInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpDefensiveWeaponInfoMenuScene();
+            }
+        });
+        targetB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                view.showTarget(currentDefensiveWeapon.getTarget());
+                // TODO: 6/6/2018
+            }
+        });
+        back3.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                currentDefensiveWeapon = null;
+                setUpshowBuildingMenuScene();
+            }
+        });
+//        defensive weapon info menu
+        Button attackInfoB = new Button(ATTACK_INFO);
+        Button defensiveInfoBackB = new Button(BACK);
+        VBox defensiveInfoComponents = new VBox(SPACING,overAllInfoB,attackInfoB,upgradeInfoB,upgradeB,defensiveInfoBackB);
+        defensiveInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        defensiveWeaponInfoMenuScene = new Scene(defensiveInfoComponents);
+        attackInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                view.attackInfo(currentDefensiveWeapon.getTarget(), currentDefensiveWeapon.getHitPower(), currentDefensiveWeapon.getRADIUS_OF_ATTACK());
+            }
+        });
+        defensiveInfoBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpDefensiveWeaponMenuScene();
+            }
+        });
+//        barracks menu
+        Button barracksInfoB = new Button(INFO);
+        Button buildingSoldierB = new Button(BUILDING_SOLDIERS);
+        Button barracksStatus = new Button(STATUS);
+        Button barracksBackB = new Button(BACK);
+        VBox barracksComponents = new VBox(SPACING,barracksInfoB,buildingSoldierB,barracksStatus,barracksBackB);
+        barracksComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        barracksMenuScene = new Scene(barracksComponents);
+        barracksInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpBarracksInfoMenuScene();
+            }
+        });
+        buildingSoldierB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                view.buildingSoldierBarrack(world.currentGame.getPotentialSoldiers(currentBarrack));
+                // TODO: 6/6/2018   1002
+            }
+        });
+        barracksStatus.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                view.barrackStatusShower(world.currentGame.getQueueOfSoldiers(currentBarrack));
+                // TODO: 6/6/2018
+            }
+        });
+        barracksBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpshowBuildingMenuScene();
+                currentBarrack = null;
+            }
+        });
+//        barracks info menu
+        Button barracksOverallInfoB = new Button(OVERALL_INFO);
+        Button barracksUpgradeInfoB = new Button(UPGRADE_INFO);
+        Button barracksUpgradeB = new Button(UPGRADE);
+        Button barracksInfoBackB = new Button(BACK);
+        VBox barracksInfoComponents = new VBox(SPACING,barracksOverallInfoB,barracksUpgradeInfoB,barracksUpgradeB,barracksInfoBackB);
+        barracksInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        barracksInfoMenuScene = new Scene(barracksInfoComponents);
+        barracksOverallInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                //                        overall info of barrack
+                if (currentBarrack != null) {
+                    view.overAllInfoShower(currentBarrack.getLevel(), currentBarrack.getResistance());
+                } else System.err.println("no barrack is set : BUG");
+            }
+            // TODO: 6/6/2018
+        });
+        barracksUpgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                //                        upgrade info
+                if (currentBarrack != null) {
+                    view.upgradeInfoShower(currentBarrack.getCostOfUpgrade());
+                }
+                // TODO: 6/6/2018
+            }
+        });
+        barracksUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+//                upgrade barrack
+                if (currentBarrack != null) {
+                    currentBuilding = currentBarrack;
+                    view.wantUpgradeNameForCostGolds(currentBarrack.getJasonType(), currentBarrack.getCostOfUpgrade()[0]);
+                } else {
+                    System.err.println("BUG!!!!!!");
+                }
+                // TODO: 6/6/2018
+            }
+        });
+        barracksInfoBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpBarracksMenuScene();
+            }
+        });
+//        camp menu
+        Button campInfoB = new Button(INFO);
+        Button campSoldiersB = new Button(SOLDIERS);
+        Button campBackB = new Button(BACK);
+        VBox campComponents = new VBox(SPACING,campInfoB,campSoldiersB,campBackB);
+        campComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        campMenuScene = new Scene(campComponents);
+        campInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpCampInfoMenuScene();
+            }
+        });
+        campSoldiersB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                view.showCampSoldiers(world.currentGame.getSoldiersOfCamps());
+                // TODO: 6/6/2018
+            }
+        });
+        campBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                currentCamp = null;
+                setUpshowBuildingMenuScene();
+            }
+        });
+//        camp info menu
+
+
+
 
         setUpInitialMenuScene();
         stage.show();
     }//end of start
+
     public void updateBuildingList(){
         buildingItems.clear();
         for (Building b : world.currentGame.getOwnMap().getBuildings()) {

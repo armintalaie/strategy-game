@@ -36,12 +36,12 @@ public class ConstantStrings {
     public static final String OVERALL_INFO = "Overall Info";
     public static final String UPGRADE_INFO = "Upgrade Info";
     public static final String UPGRADE = "Upgrade";
-//    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
+    public static final String SOURCES_INFO = "Source Info";
+    public static final String TARGET = "Target";
+    public static final String ATTACK_INFO = "Attack Info";
+    public static final String BUILDING_SOLDIERS = "Building Soldiers";
+    public static final String STATUS = "Status";
+    public static final String SOLDIERS = "Soldiers";
 //    public static final String
 //    public static final String
 //    public static final String
