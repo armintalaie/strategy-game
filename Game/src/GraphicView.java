@@ -38,26 +38,46 @@ public class GraphicView extends Application {
 //    graphics
     Stage stage = new Stage();
     Scene initialMenuScene;
+    VBox initialComponents;
     Scene villageMenuScene;
+    VBox villageMenuComponents;
     Scene showBuildingMenuScene;
+    VBox showBuildingsComponent;
     Scene mineMenuScene;
+    VBox mineMenuComponents;
     Scene storageMenuScene;
+    VBox storageMenuComponents;
     Scene storageInfoMenuScene;
+    VBox storageInfoComponents;
     Scene mineInfoMenuScene;
+    VBox mineInfoComponents;
     Scene defensiveWeaponMenuScene;
+    VBox defensiveComponents;
     Scene defensiveWeaponInfoMenuScene;
+    VBox defensiveInfoComponents;
     Scene upgradeMenuScene;
     Scene townHallMenuScene;
+    VBox townHallComponents;
     Scene townHallInfoMenuScene;
+    VBox townHallInfoComponents;
     Scene availableBuildingMenuScene;
+    VBox availableBuildingComponents;
     Scene barracksMenuScene;
+    VBox barracksComponents;
     Scene barracksInfoMenuScene;
+    VBox barracksInfoComponents;
     Scene campMenuScene;
+    VBox campComponents;
     Scene campInfoMenuScene;
+    VBox campInfoComponents;
     Scene attackMenuScene;
+    VBox attackMenuComponents;
     Scene targetMapMenuScene;
+    VBox targetMapMenuComponents;
     Scene availableSoldiersMenuScene;
+    VBox availableSoldiersMenuComponents;
     Scene constructionOnOwnMapScene;
+    VBox constructionOnOwnMapComponents;
 //    maps
 //    Label test = new Label("test");
     VBox ownMap = new VBox();
@@ -363,7 +383,7 @@ public class GraphicView extends Application {
         alert.getDialogPane().setContent(dialogPaneContent);
         alert.showAndWait();
     }
-    public void welcomeInfo(){
+    public void setUpWelcomeInfo(){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Welcome");
         alert.setHeaderText("Pay Attention!");
@@ -466,8 +486,8 @@ public class GraphicView extends Application {
     public void setUpSaveGameDialog(){
         String address = null;
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setHeaderText("Save");
-        dialog.setContentText("Save");
+        dialog.setHeaderText("Enter Address To Save");
+        dialog.setContentText(ADDRESS_EXAMPLE);
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
             address = result.get();
@@ -503,7 +523,7 @@ public class GraphicView extends Application {
 //    initial menu
         Button newGameButton = new Button(NEW_GAME);
         Button loadButton = new Button(LOAD_GAME);
-        VBox initialComponents = new VBox(SPACING,newGameButton,loadButton);
+        initialComponents = new VBox(SPACING,newGameButton,loadButton);
         initialComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         initialMenuScene = new Scene(initialComponents);
         newGameButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -525,7 +545,7 @@ public class GraphicView extends Application {
         Button showBuildingsB = new Button(SHOW_BUILDINGS);
         Button resourcesB = new Button(RESOURCES);
         Button villageBackB = new Button(BACK);
-        VBox villageMenuComponents = new VBox(SPACING, showBuildingsB,resourcesB,attackB,villageBackB);
+        villageMenuComponents = new VBox(SPACING, showBuildingsB,resourcesB,attackB,villageBackB);
         villageMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         villageMenuScene = new Scene(villageMenuComponents);
         attackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -544,6 +564,8 @@ public class GraphicView extends Application {
         villageBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                setUpSaveGameDialog();
+                world.currentGame = null;
                 setUpInitialMenuScene();
                 // TODO: 6/7/2018
             }
@@ -558,7 +580,7 @@ public class GraphicView extends Application {
                 setUpVillageMenuScene();
             }
         });
-        VBox showBuildingsComponent = new VBox(SPACING ,buildingList,showBuildingsBack);
+        showBuildingsComponent = new VBox(SPACING ,buildingList,showBuildingsBack);
         showBuildingsComponent.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         showBuildingMenuScene = new Scene(showBuildingsComponent);
         showBuildingsB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -582,7 +604,7 @@ public class GraphicView extends Application {
         Button mineInfoB =  new Button(INFO);
         Button mineB = new Button(MINE);
         Button mineBackB = new Button(BACK);
-        VBox mineMenuComponents = new VBox(SPACING , mineInfoB , mineB ,mineBackB);
+        mineMenuComponents = new VBox(SPACING , mineInfoB , mineB ,mineBackB);
         mineMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         mineMenuScene  = new Scene(mineMenuComponents);
         mineBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -618,7 +640,7 @@ public class GraphicView extends Application {
         Button mineUpgradeInfoB = new Button(UPGRADE_INFO);
         Button mineUpgradeB = new Button(UPGRADE);
         Button mineInfoBack = new Button(BACK);
-        VBox mineInfoComponents = new VBox(SPACING,mineOverAllInfoB,mineUpgradeInfoB,mineUpgradeB ,mineInfoBack);
+        mineInfoComponents = new VBox(SPACING,mineOverAllInfoB,mineUpgradeInfoB,mineUpgradeB ,mineInfoBack);
         mineInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         mineInfoMenuScene = new Scene(mineInfoComponents);
         mineOverAllInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -675,7 +697,7 @@ public class GraphicView extends Application {
 //        storage menu
         Button storageInfoB = new Button(INFO);
         Button storageBackB = new Button(BACK);
-        VBox storageMenuComponents = new VBox(SPACING,storageInfoB ,storageBackB);
+        storageMenuComponents = new VBox(SPACING,storageInfoB ,storageBackB);
         storageMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         storageMenuScene = new Scene(storageMenuComponents);
         storageInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -697,7 +719,7 @@ public class GraphicView extends Application {
         Button storageUpgradeInfoB = new Button(UPGRADE_INFO);
         Button storageUpgradeB = new Button(UPGRADE);
         Button storageInfoBackB = new Button(BACK);
-        VBox storageInfoComponents = new VBox(SPACING,storageOverallInfoB,sourceInfoB,storageUpgradeInfoB,storageUpgradeB,storageInfoBackB);
+        storageInfoComponents = new VBox(SPACING,storageOverallInfoB,sourceInfoB,storageUpgradeInfoB,storageUpgradeB,storageInfoBackB);
         storageInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         storageInfoMenuScene = new Scene(storageInfoComponents);
         storageOverallInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -768,7 +790,7 @@ public class GraphicView extends Application {
         Button defensiveInfoB = new Button(INFO);
         Button targetB = new Button(TARGET);
         Button defensiveBackB = new Button(BACK);
-        VBox defensiveComponents = new VBox(SPACING,defensiveInfoB,targetB,defensiveBackB);
+        defensiveComponents = new VBox(SPACING,defensiveInfoB,targetB,defensiveBackB);
         defensiveComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         defensiveWeaponMenuScene = new Scene(defensiveComponents);
         defensiveInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -797,7 +819,7 @@ public class GraphicView extends Application {
         Button defensiveUpgradeInfoB = new Button(UPGRADE_INFO);
         Button defensiveUpgradeB = new Button(UPGRADE);
         Button defensiveInfoBackB = new Button(BACK);
-        VBox defensiveInfoComponents = new VBox(SPACING,defensiveOverallInfoB,attackInfoB,defensiveUpgradeInfoB,defensiveUpgradeB,defensiveInfoBackB);
+        defensiveInfoComponents = new VBox(SPACING,defensiveOverallInfoB,attackInfoB,defensiveUpgradeInfoB,defensiveUpgradeB,defensiveInfoBackB);
         defensiveInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         defensiveWeaponInfoMenuScene = new Scene(defensiveInfoComponents);
         defensiveOverallInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -862,7 +884,7 @@ public class GraphicView extends Application {
         Button buildingSoldierB = new Button(BUILDING_SOLDIERS);
         Button barracksStatus = new Button(STATUS);
         Button barracksBackB = new Button(BACK);
-        VBox barracksComponents = new VBox(SPACING,barracksInfoB,buildingSoldierB,barracksStatus,barracksBackB);
+        barracksComponents = new VBox(SPACING,barracksInfoB,buildingSoldierB,barracksStatus,barracksBackB);
         barracksComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         barracksMenuScene = new Scene(barracksComponents);
         barracksInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -897,7 +919,7 @@ public class GraphicView extends Application {
         Button barracksUpgradeInfoB = new Button(UPGRADE_INFO);
         Button barracksUpgradeB = new Button(UPGRADE);
         Button barracksInfoBackB = new Button(BACK);
-        VBox barracksInfoComponents = new VBox(SPACING,barracksOverallInfoB,barracksUpgradeInfoB,barracksUpgradeB,barracksInfoBackB);
+        barracksInfoComponents = new VBox(SPACING,barracksOverallInfoB,barracksUpgradeInfoB,barracksUpgradeB,barracksInfoBackB);
         barracksInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         barracksInfoMenuScene = new Scene(barracksInfoComponents);
         barracksOverallInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -943,7 +965,7 @@ public class GraphicView extends Application {
         Button campInfoB = new Button(INFO);
         Button campSoldiersB = new Button(SOLDIERS);
         Button campBackB = new Button(BACK);
-        VBox campComponents = new VBox(SPACING,campInfoB,campSoldiersB,campBackB);
+        campComponents = new VBox(SPACING,campInfoB,campSoldiersB,campBackB);
         campComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         campMenuScene = new Scene(campComponents);
         campInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -972,7 +994,7 @@ public class GraphicView extends Application {
         Button campUpgradeInfoB = new Button(UPGRADE_INFO);
         Button campUpgradeB = new Button(UPGRADE);
         Button campInfoBackB = new Button(BACK);
-        VBox campInfoComponents = new VBox(SPACING,campOverallInfoB,campCapacityB,campUpgradeInfoB,campUpgradeB,campInfoBackB);
+        campInfoComponents = new VBox(SPACING,campOverallInfoB,campCapacityB,campUpgradeInfoB,campUpgradeB,campInfoBackB);
         campInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         campInfoMenuScene = new Scene(campInfoComponents);
         campOverallInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1017,7 +1039,7 @@ public class GraphicView extends Application {
         Button availableBuilding = new Button(AVAILABLE_BUILDINGS);
         Button townHallStatus = new Button(STATUS);
         Button townHallBackB = new Button(BACK);
-        VBox townHallComponents = new VBox(SPACING,townHallInfo,availableBuilding,townHallStatus,townHallBackB);
+        townHallComponents = new VBox(SPACING,townHallInfo,availableBuilding,townHallStatus,townHallBackB);
         townHallComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         townHallMenuScene = new Scene(townHallComponents);
         townHallInfo.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1051,7 +1073,7 @@ public class GraphicView extends Application {
         Button townHallUpgradeInfoB = new Button(UPGRADE_INFO);
         Button townHallUpgradeB = new Button(UPGRADE);
         Button townHallInfoBackB = new Button(BACK);
-        VBox townHallInfoComponents = new VBox(SPACING,townHallOverallInfoB,townHallUpgradeInfoB,townHallUpgradeB,townHallInfoBackB);
+        townHallInfoComponents = new VBox(SPACING,townHallOverallInfoB,townHallUpgradeInfoB,townHallUpgradeB,townHallInfoBackB);
         townHallInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         townHallInfoMenuScene = new Scene(townHallInfoComponents);
         townHallOverallInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1085,7 +1107,7 @@ public class GraphicView extends Application {
         });
 //        available buildings
         availableBuildingList.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        VBox availableBuildingComponents = new VBox(SPACING,availableBuildingList,townHallInfoBackB);
+        availableBuildingComponents = new VBox(SPACING,availableBuildingList,townHallInfoBackB);
         availableBuildingComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         availableBuildingMenuScene = new Scene(availableBuildingComponents);
 //        attack menu
@@ -1093,7 +1115,7 @@ public class GraphicView extends Application {
         Button loadMapB = new Button(LOAD_MAP);
         Label availableMaps = new Label(AVAILABLE_MAPS);
         Button attackBackB = new Button(BACK);
-        VBox attackMenuComponents = new VBox(SPACING,loadMapB,availableMaps,attackMapsList,attackBackB);
+        attackMenuComponents = new VBox(SPACING,loadMapB,availableMaps,attackMapsList,attackBackB);
         attackMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         attackMenuScene = new Scene(attackMenuComponents);
         loadMapB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1112,7 +1134,7 @@ public class GraphicView extends Application {
         Button targetMapInfo = new Button(MAP_INFO);
         Button attackMap = new Button(ATTACK_MAP);
         Button targetMapBackB = new Button(BACK);
-        VBox targetMapMenuComponents = new VBox(SPACING,targetMapInfo,attackMap,targetMapBackB);
+        targetMapMenuComponents = new VBox(SPACING,targetMapInfo,attackMap,targetMapBackB);
         targetMapMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         targetMapMenuScene = new Scene(targetMapMenuComponents);
         targetMapInfo.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1142,7 +1164,7 @@ public class GraphicView extends Application {
         Label availableSoldiersL = new Label(AVAILABLE_SOLDIERS);
         availableSoldiersList.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         Button availableSoldiersBackB = new Button(BACK);
-        VBox availableSoldiersMenuComponents = new VBox(SPACING,availableSoldiersL,availableSoldiersList,availableSoldiersBackB);
+        availableSoldiersMenuComponents = new VBox(SPACING,availableSoldiersL,availableSoldiersList,availableSoldiersBackB);
         availableSoldiersMenuScene = new Scene(availableSoldiersMenuComponents);
         availableSoldiersBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -1153,7 +1175,7 @@ public class GraphicView extends Application {
 //        construction on own map
         Label chooseL = new Label(CHOOSE_X_Y);
         Button constructionBackB = new Button(BACK);
-        VBox constructionOnOwnMapComponents = new VBox(SPACING,chooseL,ownMap,constructionBackB);
+        constructionOnOwnMapComponents = new VBox(SPACING,chooseL,ownMap,constructionBackB);
         constructionOnOwnMapComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         constructionOnOwnMapScene = new Scene(constructionOnOwnMapComponents);
         constructionBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1166,6 +1188,7 @@ public class GraphicView extends Application {
 
         setUpInitialMenuScene();
         stage.show();
+        setUpWelcomeInfo();
 //        key listeners
         initialComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -1182,13 +1205,14 @@ public class GraphicView extends Application {
         villageMenuComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                if (event.getCode()== KeyCode.S){
-                    setUpSaveGameDialog();
-                }else if (event.getCode()==KeyCode.SPACE){
-                    System.out.println("turned");
-                }else if (event.getCode()==KeyCode.T){
-                    setUpTurnTimeDialog();
-                }
+//                if (event.getCode()== KeyCode.S){
+//                    setUpSaveGameDialog();
+//                }else if (event.getCode()==KeyCode.SPACE){
+//                    System.out.println("turned");
+//                }else if (event.getCode()==KeyCode.T){
+//                    setUpTurnTimeDialog();
+//                }
+                // TODO: 6/7/2018 ???
             }
         });//village
         showBuildingsComponent.setOnKeyPressed(new EventHandler<KeyEvent>() {
