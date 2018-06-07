@@ -206,8 +206,8 @@ public class GraphicView extends Application {
             HBox hBox = new HBox();
             hBox.setSpacing(MAP_SPACING);
             for (int j = 0; j < 30; j++) {
-                int x = j ;
-                int y = i;
+                int y = j ;
+                int x = i;
                 Rectangle cell = new Rectangle(CELL_LENGTH,CELL_LENGTH);
                 if (world.currentGame.getOwnMap().getMap()[i][j].isEmpty() && world.currentGame.getOwnMap().getMap()[i][j].isConstructable()) {
                     cell.setFill(Color.HOTPINK);
@@ -333,16 +333,15 @@ public class GraphicView extends Application {
     }
     public void setUpBarracksStatusInfo(ArrayList<int[]> queue){
         StringBuilder context = new StringBuilder();
-        if (queue.size()==0){
-            context.append("No Soldiers In Queue!");
-        }else context.append("Soldiers In Queue Are:");
         for (int[] s : queue) {
             context.append(convertSoldierTypeToString(s[0])).append(" ").append(s[1]).append("\n");
         }
+        TextArea textArea = new TextArea(context.toString());
+        VBox dialogPaneContent = new VBox(SPACING,textArea);
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(BARRACKS_STATUS);
+        alert.setTitle("Soldiers in construction");
         alert.setHeaderText("Soldiers in queue ");
-        alert.setContentText(context.toString());
+        alert.getDialogPane().setContent(dialogPaneContent);
         alert.showAndWait();
     }
     public void setUpCampSoldiersInfo(int[] soldierNums){
@@ -1172,6 +1171,7 @@ public class GraphicView extends Application {
         availableSoldiersList.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         Button availableSoldiersBackB = new Button(BACK);
         availableSoldiersMenuComponents = new VBox(SPACING,availableSoldiersL,availableSoldiersList,availableSoldiersBackB);
+        availableSoldiersMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         availableSoldiersMenuScene = new Scene(availableSoldiersMenuComponents);
         availableSoldiersBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
