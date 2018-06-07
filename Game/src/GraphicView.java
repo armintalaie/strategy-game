@@ -4,17 +4,18 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static utils.ConstantStrings.*;
 import static utils.ConstantNumbers.*;
@@ -53,6 +54,12 @@ public class GraphicView extends Application {
     Scene campInfoMenuScene;
     Scene attackMenuScene;
     Scene targetMapMenuScene;
+    Scene availableSoldiersMenuScene;
+    Scene constructionOnOwnMapScene;
+//    maps
+    Label test = new Label("test");
+    VBox ownMap = new VBox(test);
+//    lists
     ListView<Button> buildingList = new ListView<>();
     ObservableList<Button> buildingItems = FXCollections.observableArrayList ();
 
@@ -61,6 +68,9 @@ public class GraphicView extends Application {
 
     ListView<Button> attackMapsList = new ListView<>();
     ObservableList<Button> attackMapItems = FXCollections.observableArrayList ();
+
+    ListView<HBox> availableSoldiersList = new ListView<>();
+    ObservableList<HBox> availableSoldiersItems = FXCollections.observableArrayList ();
 
 
     public void setUpInitialMenuScene() {
@@ -159,8 +169,253 @@ public class GraphicView extends Application {
         stage.setTitle(TARGET_MAP_MENU);
     }
 
-    private static Button exitButton = new Button(EXIT);
+    public void setUpAvailableSoldiersMenuScene() {
+        updateAvailableSoldiersList();
+        stage.setScene(availableSoldiersMenuScene);
+        stage.setTitle(SOLDIERS);
+    }
 
+    public void setUpConstructionOnOwnMapScene() {
+        ownMap = ownMap(world.currentGame.getOwnMap());
+        stage.setScene(constructionOnOwnMapScene);
+        stage.setTitle(CONSTRUCTION_BUILDING_WINDOW);
+    }
+
+    //    errors
+    public void setUpNoValidAddressErr(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(ERROR);
+        alert.setHeaderText(ERROR);
+        alert.setContentText(WRONG_ADDRESS);
+        alert.showAndWait();
+    }
+    public void setUpDontHaveEnoughResourceErr(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(ERROR);
+        alert.setHeaderText(ERROR);
+        alert.setContentText("Oops,You Don't Have Enough Resources!");
+        alert.showAndWait();
+    }
+    public void setUpHaveToUpgradeTownHallFirst(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(ERROR);
+        alert.setHeaderText(ERROR);
+        alert.setContentText("Oops,You Have to Upgrade Town Hall First!");
+        alert.showAndWait();
+    }
+    public void setUpCantChooseErr(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(ERROR);
+        alert.setHeaderText(ERROR);
+        alert.setContentText("Sorry,You Can't Choose This One!");
+        alert.showAndWait();
+    }
+    public void setUpNotEnoughWorkerErr(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(ERROR);
+        alert.setHeaderText(ERROR);
+        alert.setContentText("Sorry,You Don't Have Enough Workers!");
+        alert.showAndWait();
+    }
+//    information
+    public void setUpResourceInfo(int[] resources, int score){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(RESOURCES);
+        alert.setHeaderText(RESOURCES);
+        alert.setContentText("Gold : " + resources[0]+"\nElixir : " + resources[1]+"\nScore : " + score);
+        alert.showAndWait();
+    }
+    public void setUpMineInfo(int goldProduced){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(MINE);
+        alert.setHeaderText(MINE);
+        alert.setContentText("Gold Produce : " + goldProduced + " Per DeltaT");
+        alert.showAndWait();
+    }
+    public void setUpOverallInfo(int level, int resistance){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(OVERALL_INFO);
+        alert.setHeaderText(OVERALL_INFO);
+        alert.setContentText("Level : " + level +"\nHealth : " + resistance);
+        alert.showAndWait();
+    }
+    public void setUpUpgradeInfo(int[] costOfUpgrade){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(UPGRADE_INFO);
+        alert.setHeaderText(UPGRADE_INFO);
+        StringBuilder context = new StringBuilder();
+        if (costOfUpgrade[0] > 0)
+            context.append("Upgrade Cost : " + costOfUpgrade[0] + " gold");
+        if (costOfUpgrade[1] > 0)
+            context.append("\nUpgrade Cost : " + costOfUpgrade[0] + " elixir");
+        alert.setContentText(context.toString());
+        alert.showAndWait();
+    }
+    public void SetUpupgradedSuccessfullyInfo(int[] resources, int score){
+        String context = "Will be Upgraded Successfully And Now Your Resources And Score Are : "+"\nGold : " + resources[0] +"\nElixir : " + resources[1] +"\nScore :" + score;
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(UPGRADED);
+        alert.setHeaderText(UPGRADED);
+        alert.setContentText(context);
+        alert.showAndWait();
+    }
+    public void setUpTargetInfo(int[] target){
+        StringBuilder context = new StringBuilder();
+        for (int i = 0; i < 4; i++) {
+            if (target[i] != 0) {
+                context.append(convertSoldierTypeToString(i + 1)).append(" ");
+            }
+        }
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(TARGET);
+        alert.setHeaderText(TARGET);
+        alert.setContentText(context.toString());
+        alert.showAndWait();
+    }
+    public void setUpBarracksStatusInfo(ArrayList<int[]> queue){
+        StringBuilder context = new StringBuilder();
+        if (queue.size()==0){
+            context.append("No Soldiers In Queue!");
+        }else context.append("Soldiers In Queue Are:");
+        for (int[] s : queue) {
+            context.append(convertSoldierTypeToString(s[0])).append(" ").append(s[1]).append("\n");
+        }
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(BARRACKS_STATUS);
+        alert.setHeaderText("Soldiers in queue ");
+        alert.setContentText(context.toString());
+        alert.showAndWait();
+    }
+    public void setUpCampSoldiersInfo(int[] soldierNums){
+        StringBuilder context = new StringBuilder();
+        int m = 0;
+        for (int i = 0; i < soldierNums.length; i++) {
+            if (soldierNums[i] > 0) {
+                m+=1;
+                context.append(convertSoldierTypeToString(i + 1)).append(" X ").append(soldierNums[i]).append("\n");
+            }
+        }
+        if (m==0){
+            context.append("No Soldiers In Camps!");
+        }
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Camp Soldiers");
+        alert.setHeaderText("Soldiers In Camp ");
+        alert.setContentText(context.toString());
+        alert.showAndWait();
+    }
+    public void setUpCampCapacityInfo(int numOfSoldiers, int totalCapacity){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Capacity");
+        alert.setHeaderText("Capacity ");
+        alert.setContentText("Your camps capacity is " + numOfSoldiers + "/" + totalCapacity);
+        alert.showAndWait();
+    }
+    public void setUpTownHallStatusInfo(ArrayList<int[]> queue){
+        StringBuilder context = new StringBuilder();
+        for (int[] b : queue) {
+            context.append(convertTypeToBuilding(b[0])).append(" ").append(b[1]).append("\n");
+        }
+        TextArea textArea = new TextArea(context.toString());
+        VBox dialogPaneContent = new VBox(SPACING,textArea);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Buildings in construction");
+        alert.setHeaderText("Buildings in queue ");
+        alert.getDialogPane().setContent(dialogPaneContent);
+        alert.showAndWait();
+    }
+
+//    confirmations
+    public void setUpUpgradeConfirmation(int buildingType, int goldCost){
+        String context = "Do you want to upgrade "+ convertTypeToBuilding(buildingType)+" for " + goldCost + " golds?";
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(UPGRADE);
+        alert.setHeaderText(UPGRADE);
+        alert.setContentText(context);
+        // option != null.
+        Optional<ButtonType> option = alert.showAndWait();
+        if (option.isPresent()){
+            if (option.get() == ButtonType.OK){
+                // TODO: 6/7/2018
+                int r = 10;
+                if (currentBuilding != null) {
+                    r = world.currentGame.upgradeOwnBuilding(currentBuilding);
+                } else {
+                    if (currentDefensiveWeapon != null) {
+                        r = world.currentGame.upgradeOwnDefensiveBuilding(currentDefensiveWeapon);
+                    } else System.err.println("BUG!!!!");
+                }
+                if (r == -1) {
+                    setUpDontHaveEnoughResourceErr();
+                }
+                if (r == 0) {
+                    System.err.println("upgraded successfully and now your resource is :");
+                    view.shoeResources(world.currentGame.getOwnResources(), world.currentGame.getOwnScore()); //to test
+                    SetUpupgradedSuccessfullyInfo(world.currentGame.getOwnResources(), world.currentGame.getOwnScore());
+                }
+                if (r == -2) {
+                    setUpHaveToUpgradeTownHallFirst();
+                }
+            }else if (option.get() == ButtonType.CANCEL){
+                // TODO: 6/7/2018
+            }
+        }
+
+    }
+    public void setUpConstructionBuildingConfirmation(int type, int cost){
+        String context = "Build "+convertTypeToBuilding(type)+" For Cost :"+cost;
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(UPGRADE);
+        alert.setHeaderText(UPGRADE);
+        alert.setContentText(context);
+        // option != null.
+        Optional<ButtonType> option = alert.showAndWait();
+        if (option.isPresent()){
+            if (option.get() == ButtonType.OK){
+                setUpConstructionOnOwnMapScene();
+            }else if (option.get()== ButtonType.CANCEL){
+                currentBuildingTypeToBeBuilt = 0;
+            }
+        }
+    }
+
+//    dialogs
+    public void setUpLoadGameDialog(){
+        String address = null;
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setHeaderText(LOAD_MAP);
+        dialog.setContentText(ADDRESS_EXAMPLE);
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            address = result.get();
+        }
+        if (address != null){
+            int r = world.loadEnemyMap(address);
+            if (r == -1) setUpNoValidAddressErr();
+        }
+    }
+    public void setUpNumOfSoldiersDialog(){
+        String number = null;
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setHeaderText(NUM_OF_SOLDIERS);
+        dialog.setContentText(NUM_EXAMPLE);
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            number = result.get();
+        }
+        if (number != null){
+            if (Pattern.matches("\\d+",number)){
+                int r = world.currentGame.soldierMaker(currentSoldierTypeToBeBuilt, Integer.parseInt(number), currentBarrack);
+                currentSoldierTypeToBeBuilt = 0;
+                if (r==-1) setUpDontHaveEnoughResourceErr();
+                else System.err.println("Built soldiers successfully");
+            }else System.err.println("Kheili Khariii! Number!!");
+            setUpAvailableSoldiersMenuScene();
+        }
+    }
+    public void setUpLoadEnemyMapDialog(){
+
+    }
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -171,7 +426,7 @@ public class GraphicView extends Application {
 //    initial menu
         Button newGameButton = new Button(NEW_GAME);
         Button loadButton = new Button(LOAD_GAME);
-        VBox initialComponents = new VBox(SPACING,newGameButton,loadButton,exitButton);
+        VBox initialComponents = new VBox(SPACING,newGameButton,loadButton);
         initialComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         initialMenuScene = new Scene(initialComponents);
         newGameButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -184,21 +439,7 @@ public class GraphicView extends Application {
         loadButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                String address = null;
-                TextInputDialog dialog = new TextInputDialog(LOAD_GAME);
-                dialog.setHeaderText(LOAD_GAME_COMMAND);
-                dialog.setContentText(ADDRESS_EXAMPLE);
-                Optional<String> result = dialog.showAndWait();
-                if (result.isPresent()){
-                   address = result.get();
-                }
-                if (address != null){
-                    world = world.loadGame(address, GraphicView.this);
-                    if (world.games.size() > 0) {
-                        world.currentGame = world.games.get(0);
-                    }
-                }
-
+                setUpLoadGameDialog();
             }
         });
 
@@ -206,8 +447,8 @@ public class GraphicView extends Application {
         Button attackB = new Button(ATTACK);
         Button showBuildingsB = new Button(SHOW_BUILDINGS);
         Button resourcesB = new Button(RESOURCES);
-        Button backB = new Button(BACK);
-        VBox villageMenuComponents = new VBox(SPACING, showBuildingsB,resourcesB,attackB,backB);
+        Button villageBackB = new Button(BACK);
+        VBox villageMenuComponents = new VBox(SPACING, showBuildingsB,resourcesB,attackB,villageBackB);
         villageMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         villageMenuScene = new Scene(villageMenuComponents);
         attackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -220,9 +461,10 @@ public class GraphicView extends Application {
             @Override
             public void handle(MouseEvent event) {
                 view.shoeResources(world.currentGame.getOwnResources(), world.currentGame.getOwnScore());
+                setUpResourceInfo(world.currentGame.getOwnResources(), world.currentGame.getOwnScore());
             }
         });
-        backB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        villageBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 setUpInitialMenuScene();
@@ -230,17 +472,16 @@ public class GraphicView extends Application {
             }
         });
 //        show buildings
-        VBox showBuildingsComponent = new VBox();
-        Button backB1 = new Button(BACK);
+        Label buildings = new Label(SHOW_BUILDINGS);
+        Button showBuildingsBack = new Button(BACK);
         buildingList.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        showBuildingsComponent.getChildren().addAll(buildingList,backB1);
-        backB1.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        showBuildingsBack.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 setUpVillageMenuScene();
             }
         });
-        showBuildingsComponent.setSpacing(SPACING);
+        VBox showBuildingsComponent = new VBox(SPACING ,buildingList,showBuildingsBack);
         showBuildingsComponent.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         showBuildingMenuScene = new Scene(showBuildingsComponent);
         showBuildingsB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -263,11 +504,11 @@ public class GraphicView extends Application {
 //        mine menu
         Button mineInfoB =  new Button(INFO);
         Button mineB = new Button(MINE);
-        Button backB2 = new Button(BACK);
-        VBox mineMenuComponents = new VBox(SPACING , mineInfoB , mineB ,backB2);
+        Button mineBackB = new Button(BACK);
+        VBox mineMenuComponents = new VBox(SPACING , mineInfoB , mineB ,mineBackB);
         mineMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         mineMenuScene  = new Scene(mineMenuComponents);
-        backB2.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        mineBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 currentBuilding = null;
@@ -286,57 +527,63 @@ public class GraphicView extends Application {
                 if (currentBuilding.getJasonType() == 1) {
                     GoldMine temp = (GoldMine) currentBuilding;
                     view.printMine(temp.getGoldProduce());
+                    setUpMineInfo(temp.getGoldProduce());
                 } else {
                     ElixirMine temp = (ElixirMine) currentBuilding;
                     view.printMine(temp.getElixirProduce());
+                    setUpMineInfo(temp.getElixirProduce());
                 }
-                // TODO: 6/5/2018
+                // TODO: 6/5/2018 ??? har 2 --> GOLD ??
             }
         });
 //        mine info menu
-        Button overAllInfoB = new Button(OVERALL_INFO);
-        Button upgradeInfoB = new Button(UPGRADE_INFO);
-        Button upgradeB = new Button(UPGRADE);
+        Button mineOverAllInfoB = new Button(OVERALL_INFO);
+        Button mineUpgradeInfoB = new Button(UPGRADE_INFO);
+        Button mineUpgradeB = new Button(UPGRADE);
         Button mineInfoBack = new Button(BACK);
-        VBox mineInfoComponents = new VBox(SPACING,overAllInfoB,upgradeInfoB,upgradeB ,mineInfoBack);
+        VBox mineInfoComponents = new VBox(SPACING,mineOverAllInfoB,mineUpgradeInfoB,mineUpgradeB ,mineInfoBack);
         mineInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         mineInfoMenuScene = new Scene(mineInfoComponents);
-        overAllInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        mineOverAllInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 //mine /storage /defensiveWeapon overall info
                 if (currentBuilding != null) {
                     view.overAllInfoShower(currentBuilding.getLevel(), currentBuilding.getResistance());
+                    setUpOverallInfo(currentBuilding.getLevel(), currentBuilding.getResistance());
                 } else {
                     if (currentDefensiveWeapon != null) {
                         view.overAllInfoShower(currentDefensiveWeapon.getLevel(), currentDefensiveWeapon.getResistence());
+                        setUpOverallInfo(currentDefensiveWeapon.getLevel(), currentDefensiveWeapon.getResistence());
                     } else System.err.println("BUG!!!!!!  no building is selected");
                 }
-                // TODO: 6/5/2018
             }
         });
-        upgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        mineUpgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 //                        upgradeInfo for mine storage defensive weapon
                 if (currentBuilding != null) {
                     view.upgradeInfoShower(currentBuilding.getCostOfUpgrade());
+                    setUpUpgradeInfo(currentBuilding.getCostOfUpgrade());
                 } else if (currentDefensiveWeapon != null) {
                     view.upgradeInfoShower(currentDefensiveWeapon.getCOST_OF_UPGRADE());
+                    setUpUpgradeInfo(currentDefensiveWeapon.getCOST_OF_UPGRADE());
                 } else {
                     System.err.println("BUG!!!!!!");
                 }
-                // TODO: 6/5/2018
             }
         });
-        upgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        mineUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
 //                upgrade for mine building defensive weapon
                 if (currentBuilding != null) {
                     view.wantUpgradeNameForCostGolds(currentBuilding.getJasonType(), currentBuilding.getCostOfUpgrade()[0]);
+                    setUpUpgradeConfirmation(currentBuilding.getJasonType(), currentBuilding.getCostOfUpgrade()[0]);
                 } else if (currentDefensiveWeapon != null) {
                     view.wantUpgradeNameForCostGolds(currentDefensiveWeapon.getARM_TYPE(), currentDefensiveWeapon.getCOST_OF_UPGRADE()[0]);
+                    setUpUpgradeConfirmation(currentDefensiveWeapon.getARM_TYPE(), currentDefensiveWeapon.getCOST_OF_UPGRADE()[0]);
                 } else {
                     System.err.println("BUG!!!!!!");
                 }
@@ -350,7 +597,8 @@ public class GraphicView extends Application {
         });
 //        storage menu
         Button storageInfoB = new Button(INFO);
-        VBox storageMenuComponents = new VBox(SPACING,storageInfoB ,backB2);
+        Button storageBackB = new Button(BACK);
+        VBox storageMenuComponents = new VBox(SPACING,storageInfoB ,storageBackB);
         storageMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         storageMenuScene = new Scene(storageMenuComponents);
         storageInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -359,12 +607,37 @@ public class GraphicView extends Application {
                 setUpStorageInfoMenuScene();
             }
         });
+        storageBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                currentBuilding = null;
+                setUpshowBuildingMenuScene();
+            }
+        });
 //        storage info menu
+        Button storageOverallInfoB = new Button(OVERALL_INFO);
         Button sourceInfoB = new Button(SOURCES_INFO);
+        Button storageUpgradeInfoB = new Button(UPGRADE_INFO);
+        Button storageUpgradeB = new Button(UPGRADE);
         Button storageInfoBackB = new Button(BACK);
-        VBox storageInfoComponents = new VBox(SPACING,overAllInfoB,sourceInfoB,upgradeInfoB,upgradeB,storageInfoBackB);
+        VBox storageInfoComponents = new VBox(SPACING,storageOverallInfoB,sourceInfoB,storageUpgradeInfoB,storageUpgradeB,storageInfoBackB);
         storageInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         storageInfoMenuScene = new Scene(storageInfoComponents);
+        storageOverallInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                //mine /storage /defensiveWeapon overall info
+                if (currentBuilding != null) {
+                    view.overAllInfoShower(currentBuilding.getLevel(), currentBuilding.getResistance());
+                    setUpOverallInfo(currentBuilding.getLevel(), currentBuilding.getResistance());
+                } else {
+                    if (currentDefensiveWeapon != null) {
+                        view.overAllInfoShower(currentDefensiveWeapon.getLevel(), currentDefensiveWeapon.getResistence());
+                        setUpOverallInfo(currentDefensiveWeapon.getLevel(), currentDefensiveWeapon.getResistence());
+                    } else System.err.println("BUG!!!!!!  no building is selected");
+                }
+            }
+        });
         sourceInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -378,17 +651,47 @@ public class GraphicView extends Application {
                 // TODO: 6/6/2018
             }
         });
+        storageUpgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                //                        upgradeInfo for mine storage defensive weapon
+                if (currentBuilding != null) {
+                    view.upgradeInfoShower(currentBuilding.getCostOfUpgrade());
+                    setUpUpgradeInfo(currentBuilding.getCostOfUpgrade());
+                } else if (currentDefensiveWeapon != null) {
+                    view.upgradeInfoShower(currentDefensiveWeapon.getCOST_OF_UPGRADE());
+                    setUpUpgradeInfo(currentDefensiveWeapon.getCOST_OF_UPGRADE());
+                } else {
+                    System.err.println("BUG!!!!!!");
+                }
+            }
+        });
         storageInfoBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 setUpStorageMenuScene();
             }
         });
+        storageUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                //                upgrade for mine building defensive weapon
+                if (currentBuilding != null) {
+                    view.wantUpgradeNameForCostGolds(currentBuilding.getJasonType(), currentBuilding.getCostOfUpgrade()[0]);
+                    setUpUpgradeConfirmation(currentBuilding.getJasonType(), currentBuilding.getCostOfUpgrade()[0]);
+                } else if (currentDefensiveWeapon != null) {
+                    view.wantUpgradeNameForCostGolds(currentDefensiveWeapon.getARM_TYPE(), currentDefensiveWeapon.getCOST_OF_UPGRADE()[0]);
+                    setUpUpgradeConfirmation(currentDefensiveWeapon.getARM_TYPE(), currentDefensiveWeapon.getCOST_OF_UPGRADE()[0]);
+                } else {
+                    System.err.println("BUG!!!!!!");
+                }
+            }
+        });
 //        defensive weapon menu
         Button defensiveInfoB = new Button(INFO);
         Button targetB = new Button(TARGET);
-        Button back3 = new Button(BACK);
-        VBox defensiveComponents = new VBox(SPACING,defensiveInfoB,targetB,back3);
+        Button defensiveBackB = new Button(BACK);
+        VBox defensiveComponents = new VBox(SPACING,defensiveInfoB,targetB,defensiveBackB);
         defensiveComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         defensiveWeaponMenuScene = new Scene(defensiveComponents);
         defensiveInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -401,10 +704,10 @@ public class GraphicView extends Application {
             @Override
             public void handle(MouseEvent event) {
                 view.showTarget(currentDefensiveWeapon.getTarget());
-                // TODO: 6/6/2018
+                setUpTargetInfo(currentDefensiveWeapon.getTarget());
             }
         });
-        back3.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        defensiveBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 currentDefensiveWeapon = null;
@@ -412,15 +715,63 @@ public class GraphicView extends Application {
             }
         });
 //        defensive weapon info menu
+        Button defensiveOverallInfoB = new Button(OVERALL_INFO);
         Button attackInfoB = new Button(ATTACK_INFO);
+        Button defensiveUpgradeInfoB = new Button(UPGRADE_INFO);
+        Button defensiveUpgradeB = new Button(UPGRADE);
         Button defensiveInfoBackB = new Button(BACK);
-        VBox defensiveInfoComponents = new VBox(SPACING,overAllInfoB,attackInfoB,upgradeInfoB,upgradeB,defensiveInfoBackB);
+        VBox defensiveInfoComponents = new VBox(SPACING,defensiveOverallInfoB,attackInfoB,defensiveUpgradeInfoB,defensiveUpgradeB,defensiveInfoBackB);
         defensiveInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         defensiveWeaponInfoMenuScene = new Scene(defensiveInfoComponents);
+        defensiveOverallInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                //mine /storage /defensiveWeapon overall info
+                if (currentBuilding != null) {
+                    view.overAllInfoShower(currentBuilding.getLevel(), currentBuilding.getResistance());
+                    setUpOverallInfo(currentBuilding.getLevel(), currentBuilding.getResistance());
+                } else {
+                    if (currentDefensiveWeapon != null) {
+                        view.overAllInfoShower(currentDefensiveWeapon.getLevel(), currentDefensiveWeapon.getResistence());
+                        setUpOverallInfo(currentDefensiveWeapon.getLevel(), currentDefensiveWeapon.getResistence());
+                    } else System.err.println("BUG!!!!!!  no building is selected");
+                }
+            }
+        });
         attackInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 view.attackInfo(currentDefensiveWeapon.getTarget(), currentDefensiveWeapon.getHitPower(), currentDefensiveWeapon.getRADIUS_OF_ATTACK());
+            }
+        });
+        defensiveUpgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                //                        upgradeInfo for mine storage defensive weapon
+                if (currentBuilding != null) {
+                    view.upgradeInfoShower(currentBuilding.getCostOfUpgrade());
+                    setUpUpgradeInfo(currentBuilding.getCostOfUpgrade());
+                } else if (currentDefensiveWeapon != null) {
+                    view.upgradeInfoShower(currentDefensiveWeapon.getCOST_OF_UPGRADE());
+                    setUpUpgradeInfo(currentDefensiveWeapon.getCOST_OF_UPGRADE());
+                } else {
+                    System.err.println("BUG!!!!!!");
+                }
+            }
+        });
+        defensiveUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                //                upgrade for mine building defensive weapon
+                if (currentBuilding != null) {
+                    view.wantUpgradeNameForCostGolds(currentBuilding.getJasonType(), currentBuilding.getCostOfUpgrade()[0]);
+                    setUpUpgradeConfirmation(currentBuilding.getJasonType(), currentBuilding.getCostOfUpgrade()[0]);
+                } else if (currentDefensiveWeapon != null) {
+                    view.wantUpgradeNameForCostGolds(currentDefensiveWeapon.getARM_TYPE(), currentDefensiveWeapon.getCOST_OF_UPGRADE()[0]);
+                    setUpUpgradeConfirmation(currentDefensiveWeapon.getARM_TYPE(), currentDefensiveWeapon.getCOST_OF_UPGRADE()[0]);
+                } else {
+                    System.err.println("BUG!!!!!!");
+                }
             }
         });
         defensiveInfoBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -447,14 +798,14 @@ public class GraphicView extends Application {
             @Override
             public void handle(MouseEvent event) {
                 view.buildingSoldierBarrack(world.currentGame.getPotentialSoldiers(currentBarrack));
-                // TODO: 6/6/2018   1002
+                setUpAvailableSoldiersMenuScene();
             }
         });
         barracksStatus.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 view.barrackStatusShower(world.currentGame.getQueueOfSoldiers(currentBarrack));
-                // TODO: 6/6/2018
+                setUpBarracksStatusInfo(world.currentGame.getQueueOfSoldiers(currentBarrack));
             }
         });
         barracksBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -478,9 +829,9 @@ public class GraphicView extends Application {
                 //                        overall info of barrack
                 if (currentBarrack != null) {
                     view.overAllInfoShower(currentBarrack.getLevel(), currentBarrack.getResistance());
+                    setUpOverallInfo(currentBarrack.getLevel(), currentBarrack.getResistance());
                 } else System.err.println("no barrack is set : BUG");
             }
-            // TODO: 6/6/2018
         });
         barracksUpgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -488,8 +839,8 @@ public class GraphicView extends Application {
                 //                        upgrade info
                 if (currentBarrack != null) {
                     view.upgradeInfoShower(currentBarrack.getCostOfUpgrade());
+                    setUpUpgradeInfo(currentBarrack.getCostOfUpgrade());
                 }
-                // TODO: 6/6/2018
             }
         });
         barracksUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -499,10 +850,10 @@ public class GraphicView extends Application {
                 if (currentBarrack != null) {
                     currentBuilding = currentBarrack;
                     view.wantUpgradeNameForCostGolds(currentBarrack.getJasonType(), currentBarrack.getCostOfUpgrade()[0]);
+                    setUpUpgradeConfirmation(currentBarrack.getJasonType(), currentBarrack.getCostOfUpgrade()[0]);
                 } else {
                     System.err.println("BUG!!!!!!");
                 }
-                // TODO: 6/6/2018
             }
         });
         barracksInfoBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -528,7 +879,7 @@ public class GraphicView extends Application {
             @Override
             public void handle(MouseEvent event) {
                 view.showCampSoldiers(world.currentGame.getSoldiersOfCamps());
-                // TODO: 6/6/2018
+                setUpCampSoldiersInfo(world.currentGame.getSoldiersOfCamps());
             }
         });
         campBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -551,7 +902,7 @@ public class GraphicView extends Application {
             @Override
             public void handle(MouseEvent event) {
                 view.overAllInfoShower(currentCamp.getLevel(), currentCamp.getResistance());
-                // TODO: 6/6/2018  
+                setUpOverallInfo(currentCamp.getLevel(), currentCamp.getResistance());
             }
         });
         campCapacityB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -559,7 +910,7 @@ public class GraphicView extends Application {
             public void handle(MouseEvent event) {
                 int[] r = world.currentGame.getSoldiersAndCapacityOfCamps();
                 view.printCampsCapacity(r[0], r[1]);
-                // TODO: 6/6/2018  
+                setUpCampCapacityInfo(r[0], r[1]);
             }
         });
         campUpgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -567,9 +918,9 @@ public class GraphicView extends Application {
             public void handle(MouseEvent event) {
                 if (currentCamp != null) {
                     view.upgradeInfoShower(currentCamp.getCostOfUpgrade());
+                    setUpUpgradeInfo(currentCamp.getCostOfUpgrade());
                 } else
                     System.err.println("Bug");
-                // TODO: 6/6/2018  
             }
         });
         campUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -602,11 +953,6 @@ public class GraphicView extends Application {
             @Override
             public void handle(MouseEvent event) {
                 view.setUpAvailableBuildingsMenue32();
-//                ArrayList<Integer> r = world.currentGame.availableBuildingsAndDefensiveWeapons();
-//                if (r != null) {
-//                    view.buildingShowByType(r);
-//                }
-                // TODO: 6/6/2018
                 setUpAvailableBuildingMenuScene();
             }
         });
@@ -614,7 +960,7 @@ public class GraphicView extends Application {
             @Override
             public void handle(MouseEvent event) {
                 view.townHallStatusShower(world.currentGame.getQueueOfBuildingsAndDefensiveWeaponsToBEBuilt());
-                // TODO: 6/6/2018
+                setUpTownHallStatusInfo(world.currentGame.getQueueOfBuildingsAndDefensiveWeaponsToBEBuilt());
             }
         });
         townHallBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -635,14 +981,14 @@ public class GraphicView extends Application {
             @Override
             public void handle(MouseEvent event) {
                 view.overAllInfoShower(world.currentGame.getOwnTownHall().getLevel(), world.currentGame.getOwnTownHall().getResistance());
-                // TODO: 6/6/2018
+                setUpOverallInfo(world.currentGame.getOwnTownHall().getLevel(), world.currentGame.getOwnTownHall().getResistance());
             }
         });
         townHallUpgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 view.upgradeInfoShower(world.currentGame.getOwnTownHall().getCostOfUpgrade());
-                // TODO: 6/6/2018
+                setUpUpgradeInfo(world.currentGame.getOwnTownHall().getCostOfUpgrade());
             }
         });
         townHallUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -650,9 +996,8 @@ public class GraphicView extends Application {
             public void handle(MouseEvent event) {
                 int r = world.currentGame.upgradeTownHall();
                 if (r == -1) {
-                    view.dontHaveEnoughResource();
-                }
-                // TODO: 6/6/2018
+                    setUpDontHaveEnoughResourceErr();
+                }else SetUpupgradedSuccessfullyInfo(world.currentGame.getOwnResources(), world.currentGame.getOwnScore());
             }
         });
         townHallInfoBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -716,7 +1061,31 @@ public class GraphicView extends Application {
                 setUpAttackMenuScene();
             }
         });
-
+//        available soldiers menu
+        Label availableSoldiersL = new Label(AVAILABLE_SOLDIERS);
+        availableSoldiersList.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        Button availableSoldiersBackB = new Button(BACK);
+        VBox availableSoldiersMenuComponents = new VBox(SPACING,availableSoldiersL,availableSoldiersList,availableSoldiersBackB);
+        availableSoldiersMenuScene = new Scene(availableSoldiersMenuComponents);
+        availableSoldiersBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpBarracksMenuScene();
+            }
+        });
+//        construction on own map
+        Label chooseL = new Label(CHOOSE_X_Y);
+        Button constructionBackB = new Button(BACK);
+        VBox constructionOnOwnMapComponents = new VBox(SPACING,chooseL,ownMap,constructionBackB);
+        constructionOnOwnMapComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        constructionOnOwnMapScene = new Scene(constructionOnOwnMapComponents);
+        constructionBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                currentBuildingTypeToBeBuilt = 0;
+                setUpAvailableBuildingMenuScene();
+            }
+        });
 
         setUpInitialMenuScene();
         stage.show();
@@ -726,6 +1095,9 @@ public class GraphicView extends Application {
         buildingItems.clear();
         for (Building b : world.currentGame.getOwnMap().getBuildings()) {
             Button button = new Button(convertTypeToBuilding(b.getJasonType()) + " " +b.getId() );
+            if (b.getId()==0){
+                button.setText(convertTypeToBuilding(b.getJasonType()));
+            }
             buildingItems.add(button);
             button.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
@@ -793,12 +1165,12 @@ public class GraphicView extends Application {
                         int r = world.currentGame.constructionRequest(t);//check if it is true please!!!
 
                         if (r == -2)
-                            view.dontHaveWorker();
+                            setUpDontHaveEnoughResourceErr();
                         if (r == 0) {
                             view.setUpConstructionBuildingMenue6(t, world.currentGame.getCostOfConstruction(t)[0]);
                             currentBuildingTypeToBeBuilt = t;
+                            setUpConstructionBuildingConfirmation(t, world.currentGame.getCostOfConstruction(t)[0]);
                         }
-                        // TODO: 6/7/2018
                     }
                 });
             }//end of for
@@ -823,6 +1195,36 @@ public class GraphicView extends Application {
             }
         }
         attackMapsList.setItems(attackMapItems);
+    }
+    public void updateAvailableSoldiersList(){
+        availableSoldiersItems.clear();
+        ArrayList<int[]> potentialSoldiers=world.currentGame.getPotentialSoldiers(currentBarrack);
+        for (int i = 0; i < potentialSoldiers.size(); i++) {
+            Button button = new Button(convertSoldierTypeToString(potentialSoldiers.get(i)[0]));
+            int type =potentialSoldiers.get(i)[0];
+            Label label = new Label();
+            if (potentialSoldiers.get(i)[1] > 0) {
+                label.setText(" X " + potentialSoldiers.get(i)[1]);
+                button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        currentSoldierTypeToBeBuilt = type;
+                        setUpNumOfSoldiersDialog();
+                    }
+                });
+            } else{
+                label.setText(" U ");
+                button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        setUpCantChooseErr();
+                    }
+                });
+            }
+            HBox hBox = new HBox(SOLDIERS_SPACING,button,label);
+            availableSoldiersItems.add(hBox);
+        }
+        availableSoldiersList.setItems(availableSoldiersItems);
     }
     public String convertTypeToBuilding(int type) {
         switch (type) {
@@ -851,6 +1253,70 @@ public class GraphicView extends Application {
             default:
                 return ("invalid jsonType");
         }
+    }
+    public String convertSoldierTypeToString(int type) {
+
+        switch (type) {
+            case 1:
+                return ("Guardian");
+            case 2:
+                return ("Giant");
+            case 3:
+                return ("Dragon");
+            case 4:
+                return ("Archer");
+        }
+        return "invalid soldier type";
+    }
+    public VBox ownMap(Map map){
+        System.out.println("here");
+        for (int i = 0; i < 30; i++) {
+            for (int j = 0; j < 30; j++) {
+                if (map.getMap()[i][j].isEmpty() && map.getMap()[i][j].isConstructable()) {
+                    System.out.print("0");
+                } else
+                    System.out.print("1");
+            }
+            System.out.println();
+        }
+        VBox mapVbox = new VBox();
+        mapVbox.setSpacing(MAP_SPACING);
+        mapVbox.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        for (int i = 0; i < 30; i++) {
+            HBox hBox = new HBox();
+            hBox.setSpacing(MAP_SPACING);
+            for (int j = 0; j < 30; j++) {
+                int x = j ;
+                int y = i;
+                Rectangle cell = new Rectangle(CELL_LENGTH,CELL_LENGTH);
+                if (map.getMap()[i][j].isEmpty() && map.getMap()[i][j].isConstructable()) {
+                    cell.setFill(Color.HOTPINK);
+                    cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            int r = world.currentGame.newBuildingMaker(currentBuildingTypeToBeBuilt, x, y);
+                            if (r==-1){
+                                view.youCantBuildInThisPosition();
+                                // TODO: 6/7/2018
+                            }else {
+                                currentBuildingTypeToBeBuilt = 0;
+                                setUpAvailableBuildingMenuScene();
+                            }
+                        }
+                    });
+                }else {
+                    cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            setUpCantChooseErr();
+                        }
+                    });
+                }
+                hBox.getChildren().add(cell);
+            }
+            mapVbox.getChildren().add(hBox);
+        }
+        return mapVbox;
     }
 
 }//end of class

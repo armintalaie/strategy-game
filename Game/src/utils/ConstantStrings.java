@@ -21,7 +21,7 @@ public class ConstantStrings {
     public static final String ATTACK_MENU = "Attack Menu";
     public static final String BUILDING_SOLDIERS_MENU = "Building Soldiers";
     public static final String TARGET_MAP_MENU = "Map Menu";
-//    public static final String
+    public static final String CONSTRUCTION_BUILDING_WINDOW = "Construction Building";
 //    public static final String
 //    public static final String
 //    public static final String
@@ -61,15 +61,15 @@ public class ConstantStrings {
     public static final String AVAILABLE_MAPS = "Available Maps :";
     public static final String MAP_INFO = "Map Info";
     public static final String ATTACK_MAP = "Attack Map";
-//    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
+
+    public static final String ERROR = "Error!";
+    public static final String WRONG_ADDRESS = "Oops,Invalid File Address";
+    public static final String UPGRADED = "Upgraded!";
+    public static final String AVAILABLE_SOLDIERS = "Available Soldiers";
+    public static final String NUM_OF_SOLDIERS = "Number Of Soldiers: ";
+    public static final String NUM_EXAMPLE = "Example : 4";
+    public static final String BARRACKS_STATUS = "Barracks Status";
+    public static final String CHOOSE_X_Y = "Click On Where You Like To Build Buildings";
 //    public static final String
 //    public static final String
     //    public static final String

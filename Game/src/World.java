@@ -103,6 +103,7 @@ public class World {
             return world1;
         } catch (IOException e) {
             System.out.println("NO VALID FILE");
+            v.setUpNoValidAddressErr();
         }
         // returns -1 in case there is no valid address
         v.setUpInitialMenuScene();
