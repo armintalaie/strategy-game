@@ -1106,8 +1106,15 @@ public class GraphicView extends Application {
             }
         });
 //        available buildings
+        Button availableBuildingsBackB = new Button(BACK);
+        availableBuildingsBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpTownHallMenuScene();
+            }
+        });
         availableBuildingList.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        availableBuildingComponents = new VBox(SPACING,availableBuildingList,townHallInfoBackB);
+        availableBuildingComponents = new VBox(SPACING,availableBuildingList,availableBuildingsBackB);
         availableBuildingComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         availableBuildingMenuScene = new Scene(availableBuildingComponents);
 //        attack menu
