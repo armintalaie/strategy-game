@@ -1515,8 +1515,12 @@ public class GraphicView extends Application {
                     public void handle(MouseEvent event) {
                         int r = world.currentGame.constructionRequest(t);//check if it is true please!!!
 
-                        if (r == -2)
+                        if (r == -2){
+                            setUpNotEnoughWorkerErr();
+                        }
+                        if (r==-1){
                             setUpDontHaveEnoughResourceErr();
+                        }
                         if (r == 0) {
                             view.setUpConstructionBuildingMenue6(t, world.currentGame.getCostOfConstruction(t)[0]);
                             currentBuildingTypeToBeBuilt = t;
