@@ -54,6 +54,7 @@ public class World {
             String x = gson.toJson(world);
             bufferedWriter.write(x);
             bufferedWriter.close();
+            return 0;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

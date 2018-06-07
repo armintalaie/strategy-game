@@ -5,6 +5,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -57,8 +59,8 @@ public class GraphicView extends Application {
     Scene availableSoldiersMenuScene;
     Scene constructionOnOwnMapScene;
 //    maps
-    Label test = new Label("test");
-    VBox ownMap = new VBox(test);
+//    Label test = new Label("test");
+    VBox ownMap = new VBox();
 //    lists
     ListView<Button> buildingList = new ListView<>();
     ObservableList<Button> buildingItems = FXCollections.observableArrayList ();
@@ -176,7 +178,44 @@ public class GraphicView extends Application {
     }
 
     public void setUpConstructionOnOwnMapScene() {
-        ownMap = ownMap(world.currentGame.getOwnMap());
+        ownMap.getChildren().clear();
+
+        ownMap.setSpacing(MAP_SPACING);
+        ownMap.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        for (int i = 0; i < 30; i++) {
+            HBox hBox = new HBox();
+            hBox.setSpacing(MAP_SPACING);
+            for (int j = 0; j < 30; j++) {
+                int x = j ;
+                int y = i;
+                Rectangle cell = new Rectangle(CELL_LENGTH,CELL_LENGTH);
+                if (world.currentGame.getOwnMap().getMap()[i][j].isEmpty() && world.currentGame.getOwnMap().getMap()[i][j].isConstructable()) {
+                    cell.setFill(Color.HOTPINK);
+                    cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            int r = world.currentGame.newBuildingMaker(currentBuildingTypeToBeBuilt, x, y);
+                            if (r==-1){
+                                view.youCantBuildInThisPosition();
+                                // TODO: 6/7/2018
+                            }else {
+                                currentBuildingTypeToBeBuilt = 0;
+                                setUpAvailableBuildingMenuScene();
+                            }
+                        }
+                    });
+                }else {
+                    cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            setUpCantChooseErr();
+                        }
+                    });
+                }
+                hBox.getChildren().add(cell);
+            }
+            ownMap.getChildren().add(hBox);
+        }
         stage.setScene(constructionOnOwnMapScene);
         stage.setTitle(CONSTRUCTION_BUILDING_WINDOW);
     }
@@ -324,6 +363,14 @@ public class GraphicView extends Application {
         alert.getDialogPane().setContent(dialogPaneContent);
         alert.showAndWait();
     }
+    public void welcomeInfo(){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Welcome");
+        alert.setHeaderText("Pay Attention!");
+        alert.setContentText("You can easily SAVE game any where by pressing S on keyboard!\nTURN TIME for ONE deltaT by pressing" +
+                "SPACE!\nTURN TIME for MORE THAN ONE deltaT by pressing T! ;) ");
+        alert.showAndWait();
+    }
 
 //    confirmations
     public void setUpUpgradeConfirmation(int buildingType, int goldCost){
@@ -414,7 +461,37 @@ public class GraphicView extends Application {
         }
     }
     public void setUpLoadEnemyMapDialog(){
+// TODO: 6/7/2018
+    }
+    public void setUpSaveGameDialog(){
+        String address = null;
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setHeaderText("Save");
+        dialog.setContentText("Save");
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            address = result.get();
+        }
+        if (address != null){
+            int r = world.saveGame(address, world);
+            if (r == -1) setUpNoValidAddressErr();
+        }
+    }
+    public void setUpTurnTimeDialog(){
+        String number = null;
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setHeaderText("Num Of Turns");
+        dialog.setContentText("Num Of Turns");
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            number = result.get();
+        }
+        if (number != null){
+            if (Pattern.matches("\\d+",number)){
+                world.currentGame.turnTimeOwnMap(Integer.parseInt(number));
+            }else System.err.println("Kheili Khariii! Number!!");
 
+        }
     }
 
     public static void main(String[] args) {
@@ -1089,6 +1166,249 @@ public class GraphicView extends Application {
 
         setUpInitialMenuScene();
         stage.show();
+//        key listeners
+        initialComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//initial
+        villageMenuComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//village
+        showBuildingsComponent.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//show building
+        mineMenuComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//min menu
+        storageMenuComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//storage menu
+        storageInfoComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//storage info
+        mineInfoComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//mine info
+        defensiveComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//defensive
+        defensiveInfoComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//defensive info
+        townHallComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//town hall
+        townHallInfoComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//town hall info
+        availableBuildingComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//available buildings
+        barracksComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//barracks
+        barracksInfoComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//barracks info
+        campComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//camp
+        campInfoComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//camp info
+        attackMenuComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//attack menu
+        targetMapMenuComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//target map menu
+        availableSoldiersMenuComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//available soldiers
+        constructionOnOwnMapComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode()== KeyCode.S){
+                    setUpSaveGameDialog();
+                }else if (event.getCode()==KeyCode.SPACE){
+                    System.out.println("turned");
+                }else if (event.getCode()==KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+            }
+        });//own map
+
+
     }//end of start
 
     public void updateBuildingList(){
