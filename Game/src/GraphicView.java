@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -78,6 +79,8 @@ public class GraphicView extends Application {
     VBox availableSoldiersMenuComponents;
     Scene constructionOnOwnMapScene;
     VBox constructionOnOwnMapComponents;
+    Scene selectSoldiersScene;
+    VBox selectSoldiersComponents;
 //    maps
 //    Label test = new Label("test");
     VBox ownMap = new VBox();
@@ -240,6 +243,11 @@ public class GraphicView extends Application {
         stage.setTitle(CONSTRUCTION_BUILDING_WINDOW);
     }
 
+    public void setUpSelectSoldiersScene() {
+        stage.setScene(selectSoldiersScene);
+        stage.setTitle("Select Soldiers");
+    }
+
     //    errors
     public void setUpNoValidAddressErr(){
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -274,6 +282,20 @@ public class GraphicView extends Application {
         alert.setTitle(ERROR);
         alert.setHeaderText(ERROR);
         alert.setContentText("Sorry,You Don't Have Enough Workers!");
+        alert.showAndWait();
+    }
+    public void setUpNotEnoughUnitsErr(int type){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(ERROR);
+        alert.setHeaderText(ERROR);
+        alert.setContentText("Not Enough "+convertSoldierTypeToString(type)+"s !!!");
+        alert.showAndWait();
+    }
+    public void setUpInvalidNumberFormat(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(ERROR);
+        alert.setHeaderText(ERROR);
+        alert.setContentText("Invalid Number Format!");
         alert.showAndWait();
     }
 //    information
@@ -390,6 +412,64 @@ public class GraphicView extends Application {
                 "SPACE!\nTURN TIME for MORE THAN ONE deltaT by pressing T! ;) ");
         alert.showAndWait();
     }
+    public void setUpEnemyMapInfo(int gold, int elixir, List<EnemyBuilding> enemyBuildings){
+        StringBuilder context = new StringBuilder();
+        context.append("Gold : ").append(gold);
+        context.append("\nElixir : ").append(elixir);
+        for (int type = 1; type <= 14; type++) {
+            int number = 0;
+            String soldierType = null ;
+            for (EnemyBuilding enemyBuilding : enemyBuildings)
+                if (enemyBuilding.getType() == type)
+                    number++;
+            if (number > 0){
+                switch (type){
+                    case 1:{
+                        soldierType = "Gold mine";
+                        break;}
+                    case 2:{
+                        soldierType = "Elixir mine";
+                        break;}
+                    case 3:{
+                        soldierType = "Gold Storage";
+                        break;}
+                    case 4:{
+                        soldierType = "Elixir Storage";
+                        break;}
+                    case 5:{
+                        soldierType = "Main Building";
+                        break;}
+                    case 6:{
+                        soldierType = "Barracks";
+                        break;}
+                    case 7:{
+                        soldierType = "Camp";
+                        break;}
+                    case 8:{
+                        soldierType = "Archer tower";
+                        break;}
+                    case 9:{
+                        soldierType = "Cannon";
+                        break;}
+                    case 10:{
+                        soldierType = "Air defense";
+                        break;}
+                    case 11:{
+                        soldierType = "Wizard tower";
+                        break;}
+                }
+                context.append("\n").append(soldierType).append(" (").append(type).append(") : ").append(number);
+            }
+        }
+        TextArea textArea = new TextArea(context.toString());
+        VBox dialogPaneContent = new VBox(SPACING,textArea);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Enemy Map Info");
+        alert.setHeaderText("Enemy Map Info ");
+        alert.getDialogPane().setContent(dialogPaneContent);
+        alert.showAndWait();
+
+    }
 
 //    confirmations
     public void setUpUpgradeConfirmation(int buildingType, int goldCost){
@@ -475,12 +555,25 @@ public class GraphicView extends Application {
                 currentSoldierTypeToBeBuilt = 0;
                 if (r==-1) setUpDontHaveEnoughResourceErr();
                 else System.err.println("Built soldiers successfully");
-            }else System.err.println("Kheili Khariii! Number!!");
+            }else setUpInvalidNumberFormat();
             setUpAvailableSoldiersMenuScene();
         }
     }
     public void setUpLoadEnemyMapDialog(){
-// TODO: 6/7/2018
+        String address = null;
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setHeaderText("Enter Address To Load Enemy Map");
+        dialog.setContentText(ADDRESS_EXAMPLE);
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            address = result.get();
+        }
+        if (address != null){
+            int r = world.loadEnemyMap(address);
+            if (r == -1) setUpNoValidAddressErr();
+            setUpAttackMenuScene();
+        }
+
     }
     public void setUpSaveGameDialog(){
         String address = null;
@@ -508,9 +601,32 @@ public class GraphicView extends Application {
         if (number != null){
             if (Pattern.matches("\\d+",number)){
                 world.currentGame.turnTimeOwnMap(Integer.parseInt(number));
-            }else System.err.println("Kheili Khariii! Number!!");
+            }else setUpInvalidNumberFormat();
 
         }
+    }
+    public void setUPNumOfSoldiersToBeSelected(int soldierType){
+        int[] r = new int[2];
+        r[0] = soldierType;
+        String number = null;
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setHeaderText("Num Of Soldiers");
+        dialog.setContentText("Num Of "+convertSoldierTypeToString(soldierType)+"s");
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            number = result.get();
+        }
+        if (number != null){
+            if (Pattern.matches("\\d+",number)){
+                r[1] = Integer.parseInt(number);
+                if (world.currentGame.selectUnit(r) == 1){
+                    view.notEnoughUnits(r[0]);
+                    setUpNotEnoughUnitsErr(r[0]);
+                }
+            }else setUpInvalidNumberFormat();
+        }
+
+
     }
 
     public static void main(String[] args) {
@@ -1127,7 +1243,7 @@ public class GraphicView extends Application {
         loadMapB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                // TODO: 6/7/2018  
+                setUpLoadEnemyMapDialog();
             }
         });
         attackBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1149,13 +1265,13 @@ public class GraphicView extends Application {
                 int gold = world.currentEnemy.getResources().get("gold");
                 int elixir = world.currentEnemy.getResources().get("elixir");
                 view.showEnemyMapInfo(gold, elixir, world.currentEnemy.getBuildings());
-                // TODO: 6/7/2018  
+                setUpEnemyMapInfo(gold, elixir, world.currentEnemy.getBuildings());
             }
         });
         attackMap.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                // TODO: 6/7/2018  
+                setUpSelectSoldiersScene();
             }
         });
         targetMapBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1192,7 +1308,51 @@ public class GraphicView extends Application {
                 setUpAvailableBuildingMenuScene();
             }
         });
-
+//        select soldiers menu
+        Label selectSoldiersL = new Label(SELECT_SOLDIERS);
+        Button guardianB = new Button(convertSoldierTypeToString(1));
+        Button giantB = new Button(convertSoldierTypeToString(2));
+        Button dragonB = new Button(convertSoldierTypeToString(3));
+        Button archerB = new Button(convertSoldierTypeToString(4));
+        Button endSelectionB = new Button(END_SELECTION);
+        Button selectSoldiersBackB = new Button(BACK);
+        HBox buttonHbox = new HBox(SPACING,endSelectionB,selectSoldiersBackB);
+        buttonHbox.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        VBox soldiers = new VBox(SPACING,selectSoldiersL,guardianB,giantB,dragonB,archerB);
+        soldiers.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        selectSoldiersComponents = new VBox(SPACING,soldiers,buttonHbox);
+        selectSoldiersComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        selectSoldiersScene = new Scene(selectSoldiersComponents);
+        selectSoldiersBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpTargetMapMenuScene();
+            }
+        });
+        guardianB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUPNumOfSoldiersToBeSelected(1);
+            }
+        });
+        giantB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUPNumOfSoldiersToBeSelected(2);
+            }
+        });
+        dragonB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUPNumOfSoldiersToBeSelected(3);
+            }
+        });
+        archerB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUPNumOfSoldiersToBeSelected(4);
+            }
+        });
         setUpInitialMenuScene();
         stage.show();
         setUpWelcomeInfo();
@@ -1544,7 +1704,7 @@ public class GraphicView extends Application {
                     @Override
                     public void handle(MouseEvent event) {
                         world.setEnemyMapToCurrentGame(index);
-                        // TODO: 6/7/2018
+                        setUpTargetMapMenuScene();
                     }
                 });
             }

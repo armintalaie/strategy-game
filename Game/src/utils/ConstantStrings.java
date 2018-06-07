@@ -70,12 +70,12 @@ public class ConstantStrings {
     public static final String NUM_EXAMPLE = "Example : 4";
     public static final String BARRACKS_STATUS = "Barracks Status";
     public static final String CHOOSE_X_Y = "Click On Where You Like To Build Buildings";
-//    public static final String
-//    public static final String
-    //    public static final String
-//    public static final String
-//    public static final String
-//    public static final String
+    public static final String GUARDIAN = "Guardian";
+    public static final String  GIANT =" Giant";
+    public static final String DRAGON = "Dragon";
+    public static final String ARCHER = "Archer";
+    public static final String END_SELECTION = "End Selection";
+    public static final String SELECT_SOLDIERS = "Select Soldiers";
 //    public static final String
 //    public static final String
 //    public static final String
