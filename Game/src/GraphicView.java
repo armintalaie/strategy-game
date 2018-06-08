@@ -3,8 +3,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.Reflection;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -22,6 +26,7 @@ import java.util.regex.Pattern;
 
 import static utils.ConstantStrings.*;
 import static utils.ConstantNumbers.*;
+import static utils.Icon.*;
 
 public class GraphicView extends Application {
     View view = new View();
@@ -636,11 +641,16 @@ public class GraphicView extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 //    initial menu
-        Button newGameButton = new Button(NEW_GAME);
-        Button loadButton = new Button(LOAD_GAME);
-        initialComponents = new VBox(SPACING,newGameButton,loadButton);
+
+
+        ImageView dragon = new ImageView(new Image(DRAGON_WHITE));
+        MenuButton newGameButton = new MenuButton(NEW_GAME);
+        MenuButton loadButton = new MenuButton(LOAD_GAME);
+        initialComponents = new VBox(MENU_SPACING,newGameButton,loadButton);
         initialComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        initialMenuScene = new Scene(initialComponents);
+        initialComponents.setTranslateX(200);
+        Group roots1 = new Group(initialComponents,dragon);
+        initialMenuScene = new Scene(roots1,Color.WHITE);
         newGameButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -656,13 +666,16 @@ public class GraphicView extends Application {
         });
 
 //  village menu
-        Button attackB = new Button(ATTACK);
-        Button showBuildingsB = new Button(SHOW_BUILDINGS);
-        Button resourcesB = new Button(RESOURCES);
-        Button villageBackB = new Button(BACK);
-        villageMenuComponents = new VBox(SPACING, showBuildingsB,resourcesB,attackB,villageBackB);
+        BouncingIcon showBuildingsB = new BouncingIcon(new Image(WHITE_VILLAGE));
+        BouncingIcon villageBackB = new BouncingIcon(new Image(WHITE_BACK,SMALL_ICONS_SIZE,SMALL_ICONS_SIZE,true,true));
+        BouncingIcon attackB = new BouncingIcon(new Image(ZERE_SIAH_SEFID,SMALL_ICONS_SIZE,SMALL_ICONS_SIZE,true,true));
+        BouncingIcon resourcesB = new BouncingIcon(new Image(COINS,SMALL_ICONS_SIZE,SMALL_ICONS_SIZE,true,true));
+        HBox hBox = new HBox(SPACING,villageBackB,resourcesB,attackB);
+        hBox.setStyle("-fx-background-color: #FFFFFF;");
+        villageMenuComponents = new VBox(50,hBox,showBuildingsB);
         villageMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        villageMenuScene = new Scene(villageMenuComponents);
+        villageMenuComponents.setStyle("-fx-background-color: #FFFFFF;");
+        villageMenuScene = new Scene(villageMenuComponents,Color.WHITE);
         attackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {

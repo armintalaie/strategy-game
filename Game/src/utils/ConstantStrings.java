@@ -85,6 +85,15 @@ public class ConstantStrings {
 //    public static final String
 //    public static final String
 //    public static final String
+    //    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
+//    public static final String
 }
 
 //        , CONSTRUCTION_SOLDIER_WINDOW,
