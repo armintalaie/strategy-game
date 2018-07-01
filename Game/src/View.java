@@ -909,6 +909,7 @@ public class View {
     }
 
     public void showCampSoldiers(int[] soldierNums) {
+        System.out.println(soldierNums[5]);
         for (int i = 0; i < soldierNums.length; i++) {
             if (soldierNums[i] > 0) {
                 System.out.print(convertSoldierTypeToString(i + 1));
@@ -928,6 +929,10 @@ public class View {
                 return ("Dragon ");
             case 4:
                 return ("Archer ");
+            case 5:
+                return ("WallBreaker ");
+            case 6:
+                return ("Healer ");
         }
         return "invalid soldier type";
     }

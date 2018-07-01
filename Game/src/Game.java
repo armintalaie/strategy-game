@@ -393,7 +393,23 @@ public class Game {
         temp4[0] = 4;
         temp4[1] = getOwnResources()[1] / 60;
         potentialSoldiers.add(temp4);
+
+        /// forType5
+        // ToDo
+
+        int[] temp5 = new int[2];
+        temp5[0] = 5;
+        temp5[1] = getOwnResources()[1] /1;
+        potentialSoldiers.add(temp5);
+
+
+        //forType6
+        int[] temp6 = new int[2];
+        temp6[0] = 6;
+        temp6[1] = getOwnResources()[1] / new Healer().getCostOfProduction();
+        potentialSoldiers.add(temp6);
         return potentialSoldiers;
+
     }
 
     public int soldierMaker(int soldierType, int num, Barracks barracks) {
@@ -458,6 +474,24 @@ public class Game {
                 if (num <= getPotentialSoldiers(barracks).get(3)[1]) {
                     barracks.newSoldier(4, num);
                     availableElixir = getOwnResources()[1] - num * 60;
+                    for (int i = 0; i < ownMap.getElixirStorages().size(); i++) {
+                        ownMap.getElixirStorages().get(i).setElixirStored(0);
+                    }
+                    for (int i = 0; i < ownMap.getElixirStorages().size(); i++) {
+                        while (ownMap.getElixirStorages().get(i).getFreeSpace() != 0 && availableElixir != 0) {
+                            ownMap.getElixirStorages().get(i).addElixir(1);
+                            availableElixir--;
+                        }
+                    }
+                    return 0;
+                }
+                return -1;
+            }
+            case 6: {
+
+                if (num <= getPotentialSoldiers(barracks).get(5)[1]) {
+                    barracks.newSoldier(6, num);
+                    availableElixir = getOwnResources()[1] - num * new Healer().getCostOfProduction();
                     for (int i = 0; i < ownMap.getElixirStorages().size(); i++) {
                         ownMap.getElixirStorages().get(i).setElixirStored(0);
                     }

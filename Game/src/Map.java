@@ -345,10 +345,14 @@ class Map {
                                     barracks.get(i).getSoldiersTrained().put(4, barracks.get(i).getSoldiersTrained().get(4) - 1);
                                 }
                                 break;
-
+                                case 5:{
+//                                    camps.get(j).addUnit(new WallBraker);
+//                                    barracks.get(i).getSoldiersTrained().put(5, barracks.get(i).getSoldiersTrained().get(5) - 1);
+                                }
+                                break;
                                 case 6: {
                                     camps.get(j).addUnit(new Healer());
-                                    barracks.get(i).getSoldiersTrained().put(6, barracks.get(i).getSoldiersTrained().get(1) - 1);
+                                    barracks.get(i).getSoldiersTrained().put(6, barracks.get(i).getSoldiersTrained().get(5) - 1);
                                 }
                                 break;
                             }

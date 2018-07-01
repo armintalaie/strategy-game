@@ -20,8 +20,8 @@ public class Controller {
         input = view.updateView();
         while (input != -20) {
             currentCommand = view.getCommand();
-//            System.err.println("current command is : " + view.getCommand());
-//            System.err.println("current input value is : " + input);
+           System.err.println("current command is : " + view.getCommand());
+            System.err.println("current input value is : " + input);
             switch (input / 100) {
                 case 0: {
                     onlineCommandsControlling();
@@ -847,24 +847,47 @@ public class Controller {
                 view.statusDefensiveWeapon(world.currentGame.statusDefensiveWeaponAttackMode(r, enemyMap));
             } else view.statusBuilding(world.currentGame.statusBuildingAttackMode(r, enemyMap));
         }
-
     }
-
     private void soldiersAttack(Game currentGame, EnemyMap enemyMap) {
-        for (Person person : currentGame.getOwnMap().valuableSoldiers)
+        for (Person person : currentGame.getOwnMap().valuableSoldiers){
             if (person.getType() != 6 && person.getInEnemyMap()) {
                 int[] target = person.operate(enemyMap);
                 if (target != null)
                     hitEnemyBuilding(target, enemyMap);
                 updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
             }
+            if(person.getType() == 6 && person.getInEnemyMap()){
+                int [] target =  person.operate(world.currentGame.getOwnMap() , enemyMap);
+                if(target != null){
+                    Healer healer =(Healer) person ;
+                    healSoldiers ( target ,  healer.getHitPower() ,  currentGame.getOwnMap());
+                    ((Healer) person).loseHealth();
+                }
+                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+            }
+        }
     }
 
+    private void healSoldiers(int [] target , int healPower  , Map map) {
+        int X = target[0];
+        int Y = target[1];
+        for (Person person : map.valuableSoldiers) {
+            if (person.getInEnemyMap()) {
+                if (person.getCurrentPosition() == new int[]{X, Y})
+                    person.loseHealth(-1 * healPower);
+
+            }
+
+        }
+    }
     private void defensiveBuildingsAttack(Game currentGame, EnemyMap enemyMap) {
         for (DefensiveWeapon defensiveWeapon : enemyMap.getDefensiveWeapons()) {
             int target[] = defensiveWeapon.attack(currentGame.getOwnMap().valuableSoldiers);
             if (target[0] != -1) {
-                if (defensiveWeapon.getARM_TYPE() == 9 || defensiveWeapon.getARM_TYPE() == 11)
+                if (defensiveWeapon.getARM_TYPE() == 9
+                        || defensiveWeapon.getARM_TYPE() == 11
+                        || defensiveWeapon.getARM_TYPE() == 13
+                        || defensiveWeapon.getARM_TYPE() == 14)
                     groupHit(target, currentGame.getOwnMap().valuableSoldiers, enemyMap.getSize()[0]);
                 else
                     singleHit(target, currentGame.getOwnMap().valuableSoldiers);

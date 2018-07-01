@@ -10,10 +10,13 @@ public class ConstantNumbers {
     public static final int BUTTON_IMAGE_SIZE = 100;
     public static final int BUTTON_FONT_SIZE = 30;
     public static final int SMALL_ICONS_SIZE = 50;
-//    public static final int BUTTON_FONT_SIZE = 100;
-//    public static final int BUTTON_FONT_SIZE = 100;
-//    public static final int BUTTON_FONT_SIZE = 100;
-public static final int SCENE_WITH = 600;
-    public static final int SCENE_HEIGHT =450;
-
+    public static final int IMAGE_SPACING = 60;
+    public static final int BUTTON_SPACING = 60;
+    //    public static final int BUTTON_FONT_SIZE = 100;
+    public static final int SCENE_WITH = 700;
+    public static final int SCENE_HEIGHT =1100;
+    public static final int MOVING_RATE = 10;
+    public static final double SIZE = 33.5;
+    public static final int SOLDIER_SIZE = 100;
+    public static final int SIZE_OF_ENEMY_MAP_CELL = 24;
 }

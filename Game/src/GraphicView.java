@@ -1,25 +1,30 @@
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -29,6 +34,20 @@ import static utils.ConstantNumbers.*;
 import static utils.Icon.*;
 
 public class GraphicView extends Application {
+    int speed = 0;
+    private static HashMap<Integer , String> SoldierPhoto = new HashMap<>();
+
+    {
+        SoldierPhoto.put(0 , GRASS0);
+        SoldierPhoto.put(1 ,GAURDIAN1 );
+        SoldierPhoto.put(2 , GIANT2);
+        SoldierPhoto.put(3, DRAGON3);
+        SoldierPhoto.put(4, ARCHER4);
+        SoldierPhoto.put(5 , WALL_BREAKER5);
+        SoldierPhoto.put(6 , HEALER6);
+    }
+    ArrayList<String> buildingsImageAddress = new ArrayList<>();
+
     View view = new View();
     private World world = new World();
     String currentCommand = null;
@@ -40,8 +59,12 @@ public class GraphicView extends Application {
     int currentBuildingTypeToBeBuilt = 0;
     Integer input = 0;
     int timeAttack = 0;
-
+    GraphicOwnMapCell[][] mm = new GraphicOwnMapCell[30][30];
 //    graphics
+
+
+
+    VBox mmVbox = new VBox();
     Stage stage = new Stage();
     Scene initialMenuScene;
     VBox initialComponents;
@@ -59,6 +82,7 @@ public class GraphicView extends Application {
     VBox mineInfoComponents;
     Scene defensiveWeaponMenuScene;
     VBox defensiveComponents;
+    ImageView defensiveImage = new ImageView(new Image(WHITE_FIRE));
     Scene defensiveWeaponInfoMenuScene;
     VBox defensiveInfoComponents;
     Scene upgradeMenuScene;
@@ -86,10 +110,10 @@ public class GraphicView extends Application {
     VBox constructionOnOwnMapComponents;
     Scene selectSoldiersScene;
     VBox selectSoldiersComponents;
-//    maps
+    //    maps
 //    Label test = new Label("test");
     VBox ownMap = new VBox();
-//    lists
+    //    lists
     ListView<Button> buildingList = new ListView<>();
     ObservableList<Button> buildingItems = FXCollections.observableArrayList ();
 
@@ -101,6 +125,40 @@ public class GraphicView extends Application {
 
     ListView<HBox> availableSoldiersList = new ListView<>();
     ObservableList<HBox> availableSoldiersItems = FXCollections.observableArrayList ();
+    ////////////////////////////////////////////////////////////////////attack part
+//    line 715 in start
+    public void attack(){
+        System.out.println("building type : ????  is located in x : ???? and y:   ???? on ENEMY map");
+        System.out.println("soldier type :  ???? is located in x: ????? and y:???/");
+// TODO: 6/28/2018 ARMIN
+
+    }
+    Scene enemyMapScene;
+    VBox enemyMap = new VBox();
+    GraphicEnemyMapCell [][] enemyMapCells = new GraphicEnemyMapCell[30][30];
+    public void setUpEnemyMapScene(){
+        enemyMap.getChildren().clear();
+        stage.setScene(enemyMapScene);
+        stage.setTitle("Enemy Map");
+        loadEnemyMap();
+        for (int i = 0; i <30 ; i++) {
+            HBox hBox = new HBox();
+            for (int j = 0; j <30 ; j++) {
+                hBox.getChildren().add(enemyMapCells[i][j]);
+            }
+            enemyMap.getChildren().add(hBox);
+        }
+    }
+
+    public void loadEnemyMap() {
+        for (Building b : world.currentEnemy.getMapBuildings()) {
+            enemyMapCells[b.getPosition()[0]][b.getPosition()[1]] = new GraphicEnemyMapCell(b.getJasonType());
+        }
+        for (DefensiveWeapon d : world.currentEnemy.getDefensiveWeapons()) {
+            enemyMapCells[d.getPosition()[0]][d.getPosition()[1]] = new GraphicEnemyMapCell(d.getARM_TYPE());
+        }
+//
+    }
 
 
     public void setUpInitialMenuScene() {
@@ -113,10 +171,24 @@ public class GraphicView extends Application {
         stage.setTitle(VILLAGE_MENU);
     }
     public void setUpshowBuildingMenuScene(){
+        mmVbox.getChildren().clear();
+        ownBuildingsOnMap();
+        mmVbox.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+        mmVbox.setSpacing(MAP_SPACING);
+        for (int i = 0; i <30 ; i++) {
+            HBox hb = new HBox();
+            hb.setSpacing(MAP_SPACING);
+            for (int j = 0; j <30 ; j++) {
+                hb.getChildren().add(mm[i][j]);
+            }
+            mmVbox.getChildren().add(hb);
+        }
+
+//        mmVbox=mapMaker(mm);
         updateBuildingList();
         stage.setScene(showBuildingMenuScene);
         stage.setTitle(SHOW_BUILDINGS);
-}
+    }
     public void setUpMineMenuScene() {
         stage.setScene(mineMenuScene);
         stage.setTitle(MINE_MENU);
@@ -138,6 +210,7 @@ public class GraphicView extends Application {
     }
 
     public void setUpDefensiveWeaponMenuScene() {
+        defensiveImage.setImage(new Image(buildingsImageAddress.get(currentDefensiveWeapon.getARM_TYPE()-1)));
         stage.setScene(defensiveWeaponMenuScene);
         stage.setTitle(DEFENSIVE_WEAPON_MENU);
     }
@@ -244,6 +317,7 @@ public class GraphicView extends Application {
             }
             ownMap.getChildren().add(hBox);
         }
+//        ownMap.getChildren().add(scrollBar);
         stage.setScene(constructionOnOwnMapScene);
         stage.setTitle(CONSTRUCTION_BUILDING_WINDOW);
     }
@@ -303,7 +377,7 @@ public class GraphicView extends Application {
         alert.setContentText("Invalid Number Format!");
         alert.showAndWait();
     }
-//    information
+    //    information
     public void setUpResourceInfo(int[] resources, int score){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(RESOURCES);
@@ -462,11 +536,21 @@ public class GraphicView extends Application {
                     case 11:{
                         soldierType = "Wizard tower";
                         break;}
+                    case 12:{
+                        soldierType = "Wall";
+                    }break;
+                    case 13:{
+                        soldierType = "Trap";
+                    }break;
+                    case 14:{
+                        soldierType = "Guardian Giant";
+                    }break;
                 }
                 context.append("\n").append(soldierType).append(" (").append(type).append(") : ").append(number);
             }
         }
-        TextArea textArea = new TextArea(context.toString());
+        TextArea textArea = new TextArea
+                (context.toString());
         VBox dialogPaneContent = new VBox(SPACING,textArea);
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Enemy Map Info");
@@ -476,7 +560,7 @@ public class GraphicView extends Application {
 
     }
 
-//    confirmations
+    //    confirmations
     public void setUpUpgradeConfirmation(int buildingType, int goldCost){
         String context = "Do you want to upgrade "+ convertTypeToBuilding(buildingType)+" for " + goldCost + " golds?";
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -516,8 +600,8 @@ public class GraphicView extends Application {
     public void setUpConstructionBuildingConfirmation(int type, int cost){
         String context = "Build "+convertTypeToBuilding(type)+" For Cost :"+cost;
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(UPGRADE);
-        alert.setHeaderText(UPGRADE);
+        alert.setTitle(BUILD);
+        alert.setHeaderText(BUILD);
         alert.setContentText(context);
         // option != null.
         Optional<ButtonType> option = alert.showAndWait();
@@ -530,7 +614,17 @@ public class GraphicView extends Application {
         }
     }
 
-//    dialogs
+    //    dialogs
+    public void setUpSpeedGameDialog(){
+        String address = null;
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setHeaderText("Rate Of Game");
+        dialog.setContentText("");
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            speed = Integer.parseInt(result.get());
+        }
+    }
     public void setUpLoadGameDialog(){
         String address = null;
         TextInputDialog dialog = new TextInputDialog();
@@ -633,6 +727,19 @@ public class GraphicView extends Application {
 
 
     }
+    KeyFrame kf= new KeyFrame(new Duration(1000), new EventHandler<ActionEvent>() {
+
+        @Override
+        public void handle(ActionEvent event) {
+            System.out.println("here in key frame");
+            world.currentGame.turnTimeOwnMap(speed);
+           if (stage.getScene()==showBuildingMenuScene){
+               setUpshowBuildingMenuScene();
+           }
+        }
+
+    });
+    Timeline clashAnimation = new Timeline(Timeline.INDEFINITE,kf);
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -640,13 +747,46 @@ public class GraphicView extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        buildingsImageAddress.add(LARGE_GOLD_MINE1);
+        buildingsImageAddress.add(LARGE_ELIXIR_MINE2);
+        buildingsImageAddress.add(LARGE_GOLD_STORAGE3);
+        buildingsImageAddress.add(LARGE_ELIXIR_STORAGE4);
+        buildingsImageAddress.add(LARGE_MAIN_BUILDING5);
+        buildingsImageAddress.add(LARGE_BARRACKS6);
+        buildingsImageAddress.add(LARGE_CAMP7);
+        buildingsImageAddress.add(LARGE_ARCHER_TOWER8);
+        buildingsImageAddress.add(LARGE_CANNON9);
+        buildingsImageAddress.add(LARGE_AIR_DEFENSE10);
+        buildingsImageAddress.add(LARGE_WIZARD_TOWER11);
+//        initialization of enemy map
+        for (int i = 0; i <30 ; i++) {
+            for (int j = 0; j <30 ; j++) {
+                enemyMapCells[i][j] = new GraphicEnemyMapCell();
+            }
+        }
+//        attack map scene
+        VBox dashBoard = new VBox();
+        ScrollPane scrollPane1 = new ScrollPane(enemyMap);
+        BorderPane borderPane1 = new BorderPane(scrollPane1);
+        VBox enemyMapComponents = new VBox(borderPane1,dashBoard);
+        enemyMapScene = new Scene(enemyMapComponents);
+
+//        initialiation of map
+        for (int i = 0; i <30 ; i++) {
+            for (int j = 0; j <30 ; j++) {
+                mm[i][j] = new GraphicOwnMapCell();
+            }
+
+        }
+
+
 //    initial menu
 
 
         ImageView dragon = new ImageView(new Image(DRAGON_WHITE));
         MenuButton newGameButton = new MenuButton(NEW_GAME);
         MenuButton loadButton = new MenuButton(LOAD_GAME);
-        initialComponents = new VBox(MENU_SPACING,newGameButton,loadButton);
+        initialComponents = new VBox(BUTTON_SPACING,newGameButton,loadButton);
         initialComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         initialComponents.setTranslateX(200);
         Group roots1 = new Group(initialComponents,dragon);
@@ -656,6 +796,7 @@ public class GraphicView extends Application {
             public void handle(MouseEvent event) {
                 world.newGameMaker();
                 setUpVillageMenuScene();
+
             }
         });
         loadButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -680,6 +821,7 @@ public class GraphicView extends Application {
             @Override
             public void handle(MouseEvent event) {
                 setUpAttackMenuScene();
+                clashAnimation.stop();
             }
         });
         resourcesB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -708,9 +850,18 @@ public class GraphicView extends Application {
                 setUpVillageMenuScene();
             }
         });
-        showBuildingsComponent = new VBox(SPACING ,buildingList,showBuildingsBack);
-        showBuildingsComponent.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+
+        ScrollPane scrollPane = new ScrollPane(mmVbox);
+        BorderPane borderPane = new BorderPane(scrollPane);
+//        ScrollPane scrollPane1 = new ScrollPane(borderPane);
+//        BorderPane borderPane1 = new BorderPane(scrollPane1);
+
+        showBuildingsComponent = new VBox(SPACING ,borderPane,showBuildingsBack);
+
+//        showBuildingsComponent.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
+//        showBuildingMenuScene = new Scene(showBuildingsComponent);
         showBuildingMenuScene = new Scene(showBuildingsComponent);
+
         showBuildingsB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -725,16 +876,22 @@ public class GraphicView extends Application {
                 }
 
                 setUpshowBuildingMenuScene();
+                clashAnimation.setCycleCount(Timeline.INDEFINITE);
+                clashAnimation.playFromStart();
             }
         });
 
 //        mine menu
-        Button mineInfoB =  new Button(INFO);
-        Button mineB = new Button(MINE);
-        Button mineBackB = new Button(BACK);
-        mineMenuComponents = new VBox(SPACING , mineInfoB , mineB ,mineBackB);
+        ImageView goldMineI = new ImageView(new Image(buildingsImageAddress.get(0)));
+        MenuButton mineInfoB =  new MenuButton(INFO);
+        MenuButton mineB = new MenuButton(MINE);
+        MenuButton mineBackB = new MenuButton(BACK);
+        mineMenuComponents = new VBox(MENU_SPACING , mineInfoB , mineB ,mineBackB);
         mineMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        mineMenuScene  = new Scene(mineMenuComponents);
+        HBox roots2 = new HBox(MENU_SPACING,goldMineI,mineMenuComponents);
+        roots2.setStyle("-fx-background-color: #FFFFFF;");
+        mineMenuComponents.setStyle("-fx-background-color: #FFFFFF;");
+        mineMenuScene  = new Scene(roots2);
         mineBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -823,11 +980,15 @@ public class GraphicView extends Application {
             }
         });
 //        storage menu
-        Button storageInfoB = new Button(INFO);
-        Button storageBackB = new Button(BACK);
-        storageMenuComponents = new VBox(SPACING,storageInfoB ,storageBackB);
+        ImageView goldStorageI = new ImageView(new Image(buildingsImageAddress.get(2)));
+        MenuButton storageInfoB = new MenuButton(INFO);
+        MenuButton storageBackB = new MenuButton(BACK);
+        storageMenuComponents = new VBox(BUTTON_SPACING,storageInfoB ,storageBackB);
         storageMenuComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        storageMenuScene = new Scene(storageMenuComponents);
+        HBox hBox1 = new HBox(MENU_SPACING,goldStorageI,storageMenuComponents);
+        storageMenuComponents.setStyle("-fx-background-color: #FFFFFF;");
+        hBox1.setStyle("-fx-background-color: #FFFFFF;");
+        storageMenuScene = new Scene(hBox1);
         storageInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -915,12 +1076,15 @@ public class GraphicView extends Application {
             }
         });
 //        defensive weapon menu
-        Button defensiveInfoB = new Button(INFO);
-        Button targetB = new Button(TARGET);
-        Button defensiveBackB = new Button(BACK);
-        defensiveComponents = new VBox(SPACING,defensiveInfoB,targetB,defensiveBackB);
+        MenuButton defensiveInfoB = new MenuButton(INFO);
+        MenuButton targetB = new MenuButton(TARGET);
+        MenuButton defensiveBackB = new MenuButton(BACK);
+        defensiveComponents = new VBox(BUTTON_SPACING,defensiveInfoB,targetB,defensiveBackB);
         defensiveComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        defensiveWeaponMenuScene = new Scene(defensiveComponents);
+        HBox hBox2 = new HBox(MENU_SPACING,defensiveImage,defensiveComponents);
+        defensiveWeaponMenuScene = new Scene(hBox2);
+        defensiveComponents.setStyle("-fx-background-color: #FFFFFF;");
+        hBox2.setStyle("-fx-background-color: #FFFFFF;");
         defensiveInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -1008,13 +1172,17 @@ public class GraphicView extends Application {
             }
         });
 //        barracks menu
-        Button barracksInfoB = new Button(INFO);
-        Button buildingSoldierB = new Button(BUILDING_SOLDIERS);
-        Button barracksStatus = new Button(STATUS);
-        Button barracksBackB = new Button(BACK);
-        barracksComponents = new VBox(SPACING,barracksInfoB,buildingSoldierB,barracksStatus,barracksBackB);
+        ImageView barracksI = new ImageView(new Image(buildingsImageAddress.get(5)));
+        MenuButton barracksInfoB = new MenuButton(INFO);
+        MenuButton buildingSoldierB = new MenuButton(BUILDING_SOLDIERS);
+        MenuButton barracksStatus = new MenuButton(STATUS);
+        MenuButton barracksBackB = new MenuButton(BACK);
+        barracksComponents = new VBox(BUTTON_SPACING,barracksInfoB,buildingSoldierB,barracksStatus,barracksBackB);
         barracksComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        barracksMenuScene = new Scene(barracksComponents);
+        HBox hBox3 = new HBox(IMAGE_SPACING,barracksI,barracksComponents);
+        barracksMenuScene = new Scene(hBox3);
+        barracksComponents.setStyle("-fx-background-color: #FFFFFF;");
+        hBox3.setStyle("-fx-background-color: #FFFFFF;");
         barracksInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -1090,12 +1258,16 @@ public class GraphicView extends Application {
             }
         });
 //        camp menu
-        Button campInfoB = new Button(INFO);
-        Button campSoldiersB = new Button(SOLDIERS);
-        Button campBackB = new Button(BACK);
-        campComponents = new VBox(SPACING,campInfoB,campSoldiersB,campBackB);
+        ImageView campI = new ImageView(new Image(buildingsImageAddress.get(6)));
+        MenuButton campInfoB = new MenuButton(INFO);
+        MenuButton campSoldiersB = new MenuButton(SOLDIERS);
+        MenuButton campBackB = new MenuButton(BACK);
+        campComponents = new VBox(BUTTON_SPACING,campInfoB,campSoldiersB,campBackB);
         campComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        campMenuScene = new Scene(campComponents);
+        HBox hBox4 = new HBox(IMAGE_SPACING,campI,campComponents);
+        campMenuScene = new Scene(hBox4);
+        hBox4.setStyle("-fx-background-color: #FFFFFF;");
+        campComponents.setStyle("-fx-background-color: #FFFFFF;");
         campInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -1117,11 +1289,11 @@ public class GraphicView extends Application {
             }
         });
 //        camp info menu
-        Button campOverallInfoB = new Button(OVERALL_INFO);
-        Button campCapacityB = new Button(CAPACITY_INFO);
-        Button campUpgradeInfoB = new Button(UPGRADE_INFO);
-        Button campUpgradeB = new Button(UPGRADE);
-        Button campInfoBackB = new Button(BACK);
+        MenuButton campOverallInfoB = new MenuButton(OVERALL_INFO);
+        MenuButton campCapacityB = new MenuButton(CAPACITY_INFO);
+        MenuButton campUpgradeInfoB = new MenuButton(UPGRADE_INFO);
+        MenuButton campUpgradeB = new MenuButton(UPGRADE);
+        MenuButton campInfoBackB = new MenuButton(BACK);
         campInfoComponents = new VBox(SPACING,campOverallInfoB,campCapacityB,campUpgradeInfoB,campUpgradeB,campInfoBackB);
         campInfoComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         campInfoMenuScene = new Scene(campInfoComponents);
@@ -1153,7 +1325,7 @@ public class GraphicView extends Application {
         campUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                // TODO: 6/6/2018  
+                // TODO: 6/6/2018
             }
         });
         campInfoBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1163,13 +1335,17 @@ public class GraphicView extends Application {
             }
         });
 //        town hall menu
-        Button townHallInfo = new Button(INFO);
-        Button availableBuilding = new Button(AVAILABLE_BUILDINGS);
-        Button townHallStatus = new Button(STATUS);
-        Button townHallBackB = new Button(BACK);
-        townHallComponents = new VBox(SPACING,townHallInfo,availableBuilding,townHallStatus,townHallBackB);
+        ImageView townHallI = new ImageView(new Image(buildingsImageAddress.get(4)));
+        MenuButton townHallInfo = new MenuButton(INFO);
+        MenuButton availableBuilding = new MenuButton(AVAILABLE_BUILDINGS);
+        MenuButton townHallStatus = new MenuButton(STATUS);
+        MenuButton townHallBackB = new MenuButton(BACK);
+        townHallComponents = new VBox(BUTTON_SPACING,townHallInfo,availableBuilding,townHallStatus,townHallBackB);
         townHallComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        townHallMenuScene = new Scene(townHallComponents);
+        HBox hBox5 = new HBox(IMAGE_SPACING,townHallI,townHallComponents);
+        townHallMenuScene = new Scene(hBox5);
+        townHallComponents.setStyle("-fx-background-color: #FFFFFF;");
+        hBox5.setStyle("-fx-background-color: #FFFFFF;");
         townHallInfo.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -1290,8 +1466,8 @@ public class GraphicView extends Application {
         targetMapBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                // TODO: 6/7/2018 ?????? 
-                world.currentEnemy = null; 
+                // TODO: 6/7/2018 ??????
+                world.currentEnemy = null;
                 setUpAttackMenuScene();
             }
         });
@@ -1327,6 +1503,8 @@ public class GraphicView extends Application {
         Button giantB = new Button(convertSoldierTypeToString(2));
         Button dragonB = new Button(convertSoldierTypeToString(3));
         Button archerB = new Button(convertSoldierTypeToString(4));
+        Button wallBreakerB = new Button(convertSoldierTypeToString(5));
+        Button healerB = new Button(convertSoldierTypeToString(6));
         Button endSelectionB = new Button(END_SELECTION);
         Button selectSoldiersBackB = new Button(BACK);
         HBox buttonHbox = new HBox(SPACING,endSelectionB,selectSoldiersBackB);
@@ -1336,10 +1514,19 @@ public class GraphicView extends Application {
         selectSoldiersComponents = new VBox(SPACING,soldiers,buttonHbox);
         selectSoldiersComponents.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
         selectSoldiersScene = new Scene(selectSoldiersComponents);
+        endSelectionB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUpEnemyMapScene();
+            }
+        });
         selectSoldiersBackB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 setUpTargetMapMenuScene();
+//                world.currentGame
+//                world.currentEnemy
+                // TODO: 6/29/2018 ARMIN
             }
         });
         guardianB.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -1366,9 +1553,21 @@ public class GraphicView extends Application {
                 setUPNumOfSoldiersToBeSelected(4);
             }
         });
+        wallBreakerB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUPNumOfSoldiersToBeSelected(5);
+            }
+        });
+        healerB.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                setUPNumOfSoldiersToBeSelected(6);
+            }
+        });
         setUpInitialMenuScene();
         stage.show();
-        setUpWelcomeInfo();
+        setUpSpeedGameDialog();
 //        key listeners
         initialComponents.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -1615,6 +1814,93 @@ public class GraphicView extends Application {
 
     }//end of start
 
+
+
+    public void ownBuildingsOnMap(){
+        for (Building b : world.currentGame.getOwnMap().getBuildings()){
+//            for (int i = 0; i <30 ; i++) {
+//                for (int j = 0; j <30 ; j++) {
+//                    mm[i][j] = new GraphicOwnMapCell();
+//                }
+//
+//            }
+            mm[15][14]=new GraphicOwnMapCell(5);
+            mm[14][15]=new GraphicOwnMapCell(5);
+            mm[15][15]=new GraphicOwnMapCell(5);
+            mm[15][14].setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    setUpTownHallMenuScene();
+                }
+            });
+            mm[14][15].setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    setUpTownHallMenuScene();
+                }
+            });
+            mm[15][15].setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    setUpTownHallMenuScene();
+                }
+            });
+            System.out.println("x is "+b.getPosition()[0]);
+            mm[b.getPosition()[0]][b.getPosition()[1]] = new GraphicOwnMapCell(b.getJasonType());
+            mm[b.getPosition()[0]][b.getPosition()[1]].setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+
+                    switch (b.getJasonType()){
+                        case 1:{
+                            currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpMineMenuScene();
+                        }break;
+                        case 2:{
+                            currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpMineMenuScene();
+                        }break;
+                        case 3:{
+                            currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpStorageMenuScene();
+                        }break;
+                        case 4:{
+                            currentBuilding = world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpStorageMenuScene();
+                        }break;
+                        case 5:{
+                            setUpTownHallMenuScene();
+                        }break;
+                        case 6:{
+                            currentBarrack = (Barracks) world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpBarracksMenuScene();
+                        }break;
+                        case 7:{
+                            currentCamp = (Camp) world.currentGame.findBuildingTypeInOwnMap(b.getJasonType() ,b.getId());
+                            setUpCampMenuScene();
+                        }break;
+                    }
+                }
+            });
+
+        }
+        if (world.currentGame.getOwnDefensiveWeapon() != null) {
+            for (DefensiveWeapon d : world.currentGame.getOwnDefensiveWeapon()) {
+                mm[d.getPosition()[0]][d.getPosition()[1]]=new GraphicOwnMapCell(d.getARM_TYPE());
+//                Button button = new Button(convertTypeToBuilding(d.getARM_TYPE() ) + " " + d.getId());
+//                buildingItems.add(button);
+                mm[d.getPosition()[0]][d.getPosition()[1]].setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        currentDefensiveWeapon = world.currentGame.findDefensiveWeaponTypeInOwnMap(d.getARM_TYPE() , d.getId());
+                        setUpDefensiveWeaponMenuScene();
+                    }
+                });
+            }
+        }
+
+    }
+
     public void updateBuildingList(){
         buildingItems.clear();
         for (Building b : world.currentGame.getOwnMap().getBuildings()) {
@@ -1728,11 +2014,14 @@ public class GraphicView extends Application {
         availableSoldiersItems.clear();
         ArrayList<int[]> potentialSoldiers=world.currentGame.getPotentialSoldiers(currentBarrack);
         for (int i = 0; i < potentialSoldiers.size(); i++) {
-            Button button = new Button(convertSoldierTypeToString(potentialSoldiers.get(i)[0]));
+            String txt ="";
+            BouncingButton button = new BouncingButton(new Image(SoldierPhoto.get(potentialSoldiers.get(i)[0]),SOLDIER_SIZE,SOLDIER_SIZE,true,true)," X " + txt,10,Color.VIOLET);
+//            Button button = new Button(convertSoldierTypeToString(potentialSoldiers.get(i)[0]));
             int type =potentialSoldiers.get(i)[0];
             Label label = new Label();
             if (potentialSoldiers.get(i)[1] > 0) {
-                label.setText(" X " + potentialSoldiers.get(i)[1]);
+//                label.setText(" X " + potentialSoldiers.get(i)[1]);
+                txt=" X " + potentialSoldiers.get(i)[1];
                 button.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
@@ -1741,7 +2030,8 @@ public class GraphicView extends Application {
                     }
                 });
             } else{
-                label.setText(" U ");
+                txt="U";
+//                label.setText(" U ");
                 button.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
@@ -1778,6 +2068,12 @@ public class GraphicView extends Application {
                 return "Air defense";
             case 11:
                 return "Wizard tower";
+            case 12:
+                return "Wall";
+            case 13:
+                return "Trap";
+            case 14:
+                return "Guardian Giant";
             default:
                 return ("invalid jsonType");
         }
@@ -1793,58 +2089,12 @@ public class GraphicView extends Application {
                 return ("Dragon");
             case 4:
                 return ("Archer");
+            case 5:
+                return ("Wall breaker");
+            case 6:
+                return ("Healer");
         }
         return "invalid soldier type";
-    }
-    public VBox ownMap(Map map){
-        System.out.println("here");
-        for (int i = 0; i < 30; i++) {
-            for (int j = 0; j < 30; j++) {
-                if (map.getMap()[i][j].isEmpty() && map.getMap()[i][j].isConstructable()) {
-                    System.out.print("0");
-                } else
-                    System.out.print("1");
-            }
-            System.out.println();
-        }
-        VBox mapVbox = new VBox();
-        mapVbox.setSpacing(MAP_SPACING);
-        mapVbox.setPadding(new Insets(PADDING,PADDING,PADDING,PADDING));
-        for (int i = 0; i < 30; i++) {
-            HBox hBox = new HBox();
-            hBox.setSpacing(MAP_SPACING);
-            for (int j = 0; j < 30; j++) {
-                int x = j ;
-                int y = i;
-                Rectangle cell = new Rectangle(CELL_LENGTH,CELL_LENGTH);
-                if (map.getMap()[i][j].isEmpty() && map.getMap()[i][j].isConstructable()) {
-                    cell.setFill(Color.HOTPINK);
-                    cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent event) {
-                            int r = world.currentGame.newBuildingMaker(currentBuildingTypeToBeBuilt, x, y);
-                            if (r==-1){
-                                view.youCantBuildInThisPosition();
-                                // TODO: 6/7/2018
-                            }else {
-                                currentBuildingTypeToBeBuilt = 0;
-                                setUpAvailableBuildingMenuScene();
-                            }
-                        }
-                    });
-                }else {
-                    cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent event) {
-                            setUpCantChooseErr();
-                        }
-                    });
-                }
-                hBox.getChildren().add(cell);
-            }
-            mapVbox.getChildren().add(hBox);
-        }
-        return mapVbox;
     }
 
 }//end of class

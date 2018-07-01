@@ -1,6 +1,7 @@
 package utils;
 
 public class ConstantStrings {
+
     public static final String INITIAL_MENU = "Initial Menu";
     public static final String VILLAGE_MENU = "Village Menu";
     public static final String SHOW_BUILDING_MENU = "My Buildings";
@@ -76,7 +77,7 @@ public class ConstantStrings {
     public static final String ARCHER = "Archer";
     public static final String END_SELECTION = "End Selection";
     public static final String SELECT_SOLDIERS = "Select Soldiers";
-//    public static final String
+    public static final String BUILD = "Build";
 //    public static final String
 //    public static final String
 //    public static final String

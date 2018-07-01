@@ -210,6 +210,16 @@ class Person {
         UP, RIGHT, DOWN, LEFT , UpRight , UpLeft , DownLeft , DownRight
     }
 
+    int[] operate(Map map , EnemyMap enemyMap) {
+
+        return null;
+    }
+
+     int[] operate(Map map ,EnemyMap enemyMap, int deltaL) {
+
+        return null;
+    }
+
 }
 
 class Archer extends Person {
@@ -518,7 +528,8 @@ class Healer extends Person {
     }
 
     @Override
-    int[] findPath(EnemyMap map) {
+    int[] findPath(EnemyMap map)
+    {
         return null;
     }
 
@@ -532,16 +543,48 @@ class Healer extends Person {
         return type;
     }
 
+    @Override
+    int[] operate(Map map , EnemyMap enemyMap) {
+        int deltaL = maxDistance;
+        int[] target = findPath(map);
+        double distance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] - target[0]), 2) + Math.pow(Math.abs(currentPosition[1] - target[1]), 2));
+        if (distance > radiusOfEffect) {
+            move(target, enemyMap);
+            deltaL--;
+            operate(map, enemyMap,deltaL);
+            return null;
+        } else {
+            return attack(target, enemyMap);
+        }
+    }
+
+    @Override
+     int[] operate(Map map ,EnemyMap enemyMap, int deltaL) {
+        int[] target = findPath(map);
+        double distance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] - target[0]), 2) + Math.pow(Math.abs(currentPosition[1] - target[1]), 2));
+        if (distance > radiusOfEffect) {
+            if (deltaL > 0) {
+                move(target, enemyMap);
+                deltaL--;
+                operate(map,enemyMap , deltaL);
+                return null;
+            }
+        }
+        return null;
+    }
+
     int[] findPath(Map map) {
         double minDistance = Math.sqrt(2) * 30;
         int[] target = {-1, -1};
         for (int i = 0; i < map.valuableSoldiers.size(); i++) {
+            if(map.valuableSoldiers.get(i).getType() != this.type){
             double distance;
             distance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] - map.valuableSoldiers.get(i).currentPosition[0]), 2) + Math.pow(Math.abs(currentPosition[1] - map.valuableSoldiers.get(i).currentPosition[1]), 2));
             if (minDistance > distance) {
                 target[0] = map.valuableSoldiers.get(i).currentPosition[0];
                 target[1] = map.valuableSoldiers.get(i).currentPosition[1];
                 minDistance = distance;
+            }
             }
         }
         return target;
