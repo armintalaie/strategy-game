@@ -6,6 +6,7 @@
 	"walls": [
 		{
 			"level": 4,
+			"amount": 0,
 			"x": 6,
 			"y": 6
 		},
@@ -16,7 +17,7 @@
 		}
 	],
 	"resources": {
-		"gold": 10000,
+		"gold": 100000,
 		"elixir": 65000
 	},
 	"buildings": [
@@ -27,20 +28,23 @@
 			"y": 14
 		},
 		{
-			"type": 9,
+			"type": 3,
 			"level": 5,
+			"amount": 0,
 			"x": 7,
 			"y": 7
 		},
 		{
-			"type": 8,
+			"type": 4,
 			"level": 6,
+			"amount": 0,
 			"x": 7,
 			"y": 10
 		},
 		{
 			"type": 1,
 			"level": 4,
+			"amount": 0,	
 			"x": 5,
 			"y": 10
 		},
