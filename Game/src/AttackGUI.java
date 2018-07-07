@@ -1,6 +1,7 @@
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 //import static utils.Icon.GRASS0;
 
 public class AttackGUI {
+
     ScrollPane scrollPane = new ScrollPane();
     ScrollPane scrollPaneS = new ScrollPane();
     VBox mapResult = new VBox();
@@ -48,7 +50,7 @@ public class AttackGUI {
         SoldierPhoto.put(0 , GRASS0);
         SoldierPhoto.put(1 ,GAURDIAN1 );
         SoldierPhoto.put(2 , GIANT2);
-        SoldierPhoto.put(3, GOLD_STORAGE3);
+        SoldierPhoto.put(3, DRAGON3);
         SoldierPhoto.put(4, ARCHER4);
         SoldierPhoto.put(5 , WALL_BREAKER5);
         SoldierPhoto.put(6 , HEALER6);
@@ -84,7 +86,11 @@ public class AttackGUI {
     //-------------------------------------
     Label gold = new Label() ;
     Label elixir = new Label();
+    //.....................................
 
+    public boolean checkIfItFinished(){
+        return attackThread.getEnd();
+    }
 
     public  AttackGUI( AttackThread attackThread ) {
         scene.setFill(Paint.valueOf("#1D272A"));
@@ -471,7 +477,7 @@ class SoldierGUI {
         SoldierPhoto.put(0 , GRASS0);
         SoldierPhoto.put(1 ,GAURDIAN1 );
         SoldierPhoto.put(2 , GIANT2);
-        SoldierPhoto.put(3, GOLD_STORAGE3);
+        SoldierPhoto.put(3, DRAGON3);
         SoldierPhoto.put(4, ARCHER4);
         SoldierPhoto.put(5 , WALL_BREAKER5);
         SoldierPhoto.put(6 , HEALER6);
