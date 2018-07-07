@@ -4,6 +4,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class AttackThread implements Runnable {
     private Scene scene;
@@ -12,6 +13,10 @@ public class AttackThread implements Runnable {
     private AttackGUI attackGUI ;
     private EnemyMap enemyMap ;
     private Game currentGame ;
+
+    public boolean isEnd() {
+        return end;
+    }
 
     @Override
     public void run() {
@@ -75,24 +80,64 @@ public class AttackThread implements Runnable {
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private void soldiersAttack(Game currentGame, EnemyMap enemyMap) {
+    private  void soldiersAttack(Game currentGame, EnemyMap enemyMap) {
+        ArrayList<Person> people = new ArrayList<>();
+//        ArrayList<Person> toLoseHealth = new ArrayList<>();
+//        Iterator<Person> iterator = currentGame.getOwnMap().valuableSoldiers.iterator();
+//        while (iterator.hasNext()){
+//
+//            Person person = iterator.next();
+//            if (person.getType() != 6 && person.getInEnemyMap()) {
+//
+//                int[] target = person.operate(enemyMap);
+//                if (target != null)
+//                    hitEnemyBuilding(target, enemyMap);
+////                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+//            }
+//            if(person.getType() == 6 && person.getInEnemyMap()){
+//                int [] target =  person.operate(currentGame.getOwnMap() , enemyMap);
+//                if(target != null){
+//                    Healer healer =(Healer) person ;
+//                    healSoldiers ( target ,  healer.getHitPower() ,  currentGame.getOwnMap());
+//                    toLoseHealth.add(person);
+////                   ((Healer) person).loseHealth();
+//                }
+////                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+//            }
+////            synchronized (this){
+////                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+////            }
+//        }
+//        for (Person person : currentGame.getOwnMap().valuableSoldiers){
+//            updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+//        }
         for (Person person : currentGame.getOwnMap().valuableSoldiers){
             if (person.getType() != 6 && person.getInEnemyMap()) {
                 int[] target = person.operate(enemyMap);
                 if (target != null)
                     hitEnemyBuilding(target, enemyMap);
-                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+                people.add(person);
+//                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
             }
             if(person.getType() == 6 && person.getInEnemyMap()){
                 int [] target =  person.operate(currentGame.getOwnMap() , enemyMap);
                 if(target != null){
                     Healer healer =(Healer) person ;
                     healSoldiers ( target ,  healer.getHitPower() ,  currentGame.getOwnMap());
+//                    toLoseHealth.add(person);
                     ((Healer) person).loseHealth();
+                    people.add(person);
                 }
-                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+//                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
             }
         }
+        for (Person p : people){
+            updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
+        }
+//        for (Person p : toLoseHealth){
+//           ((Healer) p).loseHealth();
+//        }
+////        toLoseHealth.clear();
     }
 
     private void hitEnemyBuilding(int[] attack, EnemyMap enemyMap) {
@@ -256,7 +301,10 @@ public class AttackThread implements Runnable {
                     break;
                 }
     }
-    private boolean gameFinished(EnemyMap enemyMap, Game game) {
+    private boolean
+
+
+    gameFinished(EnemyMap enemyMap, Game game) {
         if (game.ownMap.valuableSoldiers.size() == 0)
             return true;
         int num = 0;

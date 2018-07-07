@@ -19,11 +19,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,8 +49,14 @@ public class OwnGUI extends Application {
     Camp currentCamp = null;
     int currentSoldierTypeToBeBuilt = 0;
     int currentBuildingTypeToBeBuilt = 0;
+    //........................................
+    AttackGUI attackGUI =null;
+//    ........................................
+Media media = new Media(new File("src\\music\\home_music_part_1.mp3").toURI().toString());
+    MediaPlayer mediaPlayer = new MediaPlayer(media);
 
-//graphic
+
+    //graphic
     Stage primaryStage = new Stage();
     GraphicOwnMapCell[][] mm = new GraphicOwnMapCell[30][30];
     Group root = new Group();
@@ -68,6 +77,8 @@ public class OwnGUI extends Application {
     VBox selectSoldiersComponents = new VBox();
     Group root3 = new Group();
     Scene scene3 = new Scene(root3,1100,720);
+    Group root4 = new Group();
+    Scene scene4 = new Scene(root4,1100,720);
     KeyFrame kf= new KeyFrame(new Duration(1000), new EventHandler<ActionEvent>() {
 
         @Override
@@ -85,6 +96,22 @@ public class OwnGUI extends Application {
 
     });
     Timeline clashAnimation = new Timeline(Timeline.INDEFINITE,kf);
+    //.................................................................
+    KeyFrame kf1 = new KeyFrame(new Duration(1000), new EventHandler<ActionEvent>() {
+        @Override
+        public void handle(ActionEvent event) {
+            if (attackGUI!=null){
+                if(attackGUI.checkIfItFinished()){
+                   System.out.println("it is finished");
+                   setEndGameScene();
+                   attackGUI = null;
+                   mediaPlayer.play();
+                }
+
+            }
+        }
+    });
+    Timeline attackMode = new Timeline(Timeline.INDEFINITE,kf1);
     public static void main(String[] args) {
         launch(args);
     }
@@ -106,7 +133,9 @@ public class OwnGUI extends Application {
     //start
     @Override
     public void start(Stage stage) throws Exception {
+        mediaPlayer.play();
         clashAnimation.setCycleCount(Timeline.INDEFINITE);
+        attackMode.setCycleCount(Timeline.INDEFINITE);
         initialOwnMap();
         setInitialMenu();
         primaryStage.setScene(scene);
@@ -135,12 +164,13 @@ public class OwnGUI extends Application {
         endSelectionB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                mediaPlayer.stop();
                 AttackThread attackThread =new AttackThread(world.currentGame,world.currentEnemy , primaryStage , scene);
                 Thread thread = new Thread(attackThread);
                 thread.start();
-                AttackGUI attackGUI = new AttackGUI(attackThread);
+                attackGUI = new AttackGUI(attackThread);
                 primaryStage.setScene(attackGUI.getScene());
-
+                attackMode.playFromStart();
 
 
             }
@@ -187,6 +217,35 @@ public class OwnGUI extends Application {
                 setUPNumOfSoldiersToBeSelected(6);
             }
         });
+    }
+    //..........................................
+    public  void setEndGameScene(){
+        root4.getChildren().clear();
+        ImageView dragon = new ImageView(new Image(DRAGON_WHITE,300,300,true,true));
+        dragon.relocate(30,30);
+        MenuButton gemeEnded = new MenuButton("Game Ended!");
+        gemeEnded.relocate(500,300);
+//        MenuButton loadButton = new MenuButton(LOAD_GAME);
+//        loadButton.relocate(490,350);
+        ImageView angel1 = new ImageView(new Image(ANGEL1));
+        angel1.relocate(700,10);
+        ImageView angel2 = new ImageView(new Image(ANGEL2));
+        angel2.relocate(300,550);
+        ImageView angel3 = new ImageView(new Image(ANGEL3));
+        angel3.relocate(850,390);
+        BouncingIcon butt = new BouncingIcon(new Image(WHITE_VILLAGE));
+        butt.relocate(600,400);
+        Button button = new Button("back to our village");
+        butt.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                clashAnimation.playFromStart();
+                setOwnMap();
+            }
+        });
+        root4.getChildren().addAll(dragon,gemeEnded,angel1,angel2,angel3,butt);
+        primaryStage.setScene(scene4);
+        attackMode.stop();
     }
     //............................................................
     private void setAttackScene(){
@@ -409,6 +468,12 @@ public class OwnGUI extends Application {
                 if (event.getCode()== KeyCode.S){
                     setUpSaveGameDialog();
                 }
+                if (event.getCode()== KeyCode.T){
+                    setUpTurnTimeDialog();
+                }
+                if (event.getCode()== KeyCode.R){
+                    setUpSpeedGameDialog();
+                }
             }
         });
 
@@ -435,7 +500,7 @@ public class OwnGUI extends Application {
             context.append("\nUpgrade Cost : " +currentBuilding.getCostOfUpgrade()[0] + " elixir");
         Label label3 = new Label(context.toString());
 
-        Button upgradeB = new Button("Upgrade");
+        MenuButton upgradeB = new MenuButton("Upgrade");
         upgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -454,7 +519,7 @@ public class OwnGUI extends Application {
         if (currentBuilding.getCostOfUpgrade()[1] > 0)
             context.append("\nUpgrade Cost : " +currentBuilding.getCostOfUpgrade()[0] + " elixir");
         Label label3 = new Label(context.toString());
-        Button upgradeB = new Button("Upgrade");
+        MenuButton upgradeB = new MenuButton("Upgrade");
         upgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -474,7 +539,7 @@ public class OwnGUI extends Application {
         Label label3 = new Label("Your gold storage is " +
                 world.currentGame.getGoldAndElixirStorageAndCapacity()[0][0] +
                 "/Your elixir storage is " + world.currentGame.getGoldAndElixirStorageAndCapacity()[0][1]);
-        Button upgradeB = new Button();
+        MenuButton upgradeB = new MenuButton("Upgrade");
         upgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -499,7 +564,7 @@ public class OwnGUI extends Application {
         if (world.currentGame.getOwnTownHall().getCostOfUpgrade()[1] > 0)
             context.append("\nUpgrade Cost : " + world.currentGame.getOwnTownHall().getCostOfUpgrade()[0] + " elixir");
         Label label2 = new Label(context.toString());
-        Button townHallUpgradeB = new Button("Upgrade");
+        MenuButton townHallUpgradeB = new MenuButton("Upgrade");
         townHallUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -524,7 +589,7 @@ public class OwnGUI extends Application {
             context.append("\nUpgrade Cost : " + currentBarrack.getCostOfUpgrade()[0] + " elixir");
         Label label2 = new Label(context.toString());
 //        setUpUpgradeInfo(currentBarrack.getCostOfUpgrade());
-        Button barracksUpgradeB = new Button("Upgrade");
+        MenuButton barracksUpgradeB = new MenuButton("Upgrade");
         barracksUpgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -561,7 +626,7 @@ public class OwnGUI extends Application {
         Label label2 = new Label(context.toString());
         Label label3 = new Label("Damage : "+currentDefensiveWeapon.getHitPower());
         Label label4 = new Label("Damage Radius : " + currentDefensiveWeapon.getRADIUS_OF_ATTACK());
-        Button upgradeB = new Button("Upgrade");
+        MenuButton upgradeB = new MenuButton("Upgrade");
         upgradeB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
