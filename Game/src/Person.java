@@ -7,6 +7,7 @@ class Person {
     protected int type;
     protected int costOfProduction;
     protected int timeOfProduction;
+    int fullHealth ;
     protected int health;
     protected int radiusOfEffect;
     protected int hitPower;
@@ -17,6 +18,10 @@ class Person {
     protected boolean inEnemyMap = false;
 
     public Person() {
+    }
+
+    public int getFullHealth() {
+        return fullHealth;
     }
 
     public void setInEnemyMap(boolean inEnemyMap) {
@@ -224,6 +229,7 @@ class Person {
 
 class Archer extends Person {
     Archer() {
+        this.fullHealth = 100 + level * 5;
         type = 4;
         this.costOfProduction = 60;
         this.hitPower = 10 + level;
@@ -287,6 +293,7 @@ class Archer extends Person {
 class Guardian extends Person {
     Guardian() {
         type = 1;
+        this.fullHealth = 100 + level * 5;
         this.costOfProduction = 50;
         this.hitPower = 10;
         this.level = 0;
@@ -357,6 +364,7 @@ class Giant extends Person {
         this.timeOfProduction = 30;
         this.radiusOfEffect = 1;
         this.health = 500 + level * 5;
+        this.fullHealth = 500 + level * 5;
         this.canFly = false;
     }
 
@@ -433,6 +441,7 @@ class Dragon extends Person {
         this.radiusOfEffect = 3;
         this.health = 700 + level * 5;
         this.canFly = true;
+        this.fullHealth = 700 + level * 5;
     }
 
     @Override
@@ -525,6 +534,7 @@ class WallBreaker extends Person {
         this.radiusOfEffect = 1;
         this.health = 100 + level * 5;
         this.canFly = false;
+        this.fullHealth = 100 + level * 5;
     }
 
     @Override
@@ -600,6 +610,7 @@ class Healer extends Person {
         this.radiusOfEffect = 10;
         this.health = 10;
         this.canFly = true;
+        this.fullHealth = 10;
     }
 
     @Override

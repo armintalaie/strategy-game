@@ -2,12 +2,14 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -382,8 +384,9 @@ public class AttackGUI {
                     valuableSoldiers.get(i).setCurrentPosition(new int[] {x , y});
                     valuableSoldiers.get(i).setInEnemyMap(true);
                     soldierGUIS.add(new SoldierGUI(valuableSoldiers.get(i)));
-                    map.getChildren().add(soldierGUIS.get(soldierGUIS.size()-1).getImageView());
                     map.getChildren().add(soldierGUIS.get(soldierGUIS.size()-1).progressBar);
+                    map.getChildren().add(soldierGUIS.get(soldierGUIS.size()-1).getImageView());
+
                    // attackThread.updateAttackThread(currentSoldierType , x , y);
                     currentSoldierType = -1;
                     break;
@@ -424,10 +427,10 @@ public class AttackGUI {
     }
     public void updateSoldiers (){
         for(int i = 0 ; i < soldierGUIS.size() ; i++) {
+            soldierGUIS.get(i).progressBar.relocate(SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[1], SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[0] - 10);
 
             //System.out.println("hilo"+soldierGUIS.get(i).getPerson().getCurrentPosition()[1]);
             soldierGUIS.get(i).imageView.relocate(SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[1], SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[0]);
-
         }
     }
 
@@ -479,15 +482,21 @@ class SoldierGUI {
     SoldierGUI(Person person){
         double ratio = new Image(SoldierPhoto.get(person.type)).getHeight() / new Image(SoldierPhoto.get(person.type)).getWidth();
         ImageView imageView = new ImageView(new Image(SoldierPhoto.get(person.type) , 30 , 30 , true , true ) );
-        // System.out.println(person.getCurrentPosition()[0]+" "+person.getCurrentPosition()[1]);
         imageView.relocate(  SIZE_OF_ENEMY_MAP_CELL*person.getCurrentPosition()[1] , SIZE_OF_ENEMY_MAP_CELL*person.getCurrentPosition()[0]);
         this.imageView = imageView;
-        progressBar.relocate(SIZE_OF_ENEMY_MAP_CELL*person.getCurrentPosition()[1] , SIZE_OF_ENEMY_MAP_CELL*person.getCurrentPosition()[0]);
+        progressBar.setStyle("-fx-background-color: orange ; -fx-pref-width: 50 ;-fx-fill: orange");
+        progressBar.relocate(SIZE_OF_ENEMY_MAP_CELL*person.getCurrentPosition()[1] , SIZE_OF_ENEMY_MAP_CELL*person.getCurrentPosition()[0] - 10);
+        progressBar.setProgress(person.health / person.getFullHealth() );
+
         this.person = person;
     }
 
     public ImageView getImageView() {
         return imageView;
+    }
+
+    public ProgressBar getProgressBar() {
+        return progressBar;
     }
 
     public Person getPerson() {

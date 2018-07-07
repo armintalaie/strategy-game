@@ -141,14 +141,6 @@ public class OwnGUI extends Application {
                 AttackGUI attackGUI = new AttackGUI(attackThread);
                 primaryStage.setScene(attackGUI.getScene());
 
-                for(;;)
-                    if(attackThread.getEnd()){
-
-
-                        primaryStage.setScene(scene1);
-                        break;
-
-                    }
 
 
             }
