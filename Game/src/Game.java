@@ -140,6 +140,16 @@ public class Game {
 
         if (getOwnResources()[0] >= 500)
             availableTypes.add(11);
+
+        if (getOwnResources()[0] >= 100)
+            availableTypes.add(12);
+
+        if (getOwnResources()[0] >= 100)
+            availableTypes.add(13);
+
+        if (getOwnResources()[0] >= 10000)
+            availableTypes.add(14);
+
         return availableTypes;
     }
 
@@ -150,8 +160,13 @@ public class Game {
     public int constructionRequest(int buildingType) {
         for (int i = 0; i < availableBuildingsAndDefensiveWeapons().size(); i++) {
             if (availableBuildingsAndDefensiveWeapons().get(i) == buildingType)
-                if (ownMap.getMainBuilding().getFreeWorker() >= 1)
+                if (ownMap.getMainBuilding().getFreeWorker() >= 1){
+                    if (buildingType ==14){
+                        if (ownMap.giantCastles.size()>=1) return -3;
+                        return 0;
+                    }else
                     return 0;
+                }
                 else
                     return -2;
         }
@@ -399,7 +414,7 @@ public class Game {
 
         int[] temp5 = new int[2];
         temp5[0] = 5;
-        temp5[1] = getOwnResources()[1] /1;
+        temp5[1] = getOwnResources()[1] /60;
         potentialSoldiers.add(temp5);
 
 
@@ -487,6 +502,24 @@ public class Game {
                 }
                 return -1;
             }
+            case 5: {
+
+                if (num <= getPotentialSoldiers(barracks).get(4)[1]) {
+                    barracks.newSoldier(5, num);
+                    availableElixir = getOwnResources()[1] - num * 60;
+                    for (int i = 0; i < ownMap.getElixirStorages().size(); i++) {
+                        ownMap.getElixirStorages().get(i).setElixirStored(0);
+                    }
+                    for (int i = 0; i < ownMap.getElixirStorages().size(); i++) {
+                        while (ownMap.getElixirStorages().get(i).getFreeSpace() != 0 && availableElixir != 0) {
+                            ownMap.getElixirStorages().get(i).addElixir(1);
+                            availableElixir--;
+                        }
+                    }
+                    return 0;
+                }
+                return -1;
+            }
             case 6: {
 
                 if (num <= getPotentialSoldiers(barracks).get(5)[1]) {
@@ -541,6 +574,12 @@ public class Game {
                         allSoldiers[3] += 1;
                     }
                     break;
+                    case 5:{
+                        allSoldiers[4] += 1;
+                    }break;
+                    case 6:{
+                        allSoldiers[5] += 1;
+                    }break;
                 }
             }
         }

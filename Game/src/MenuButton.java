@@ -7,7 +7,8 @@ import static utils.Icon.*;
 
 public class MenuButton extends BouncingButton {
     public MenuButton(String name) {
-        super(new Image(WHITE_FIRE,BUTTON_IMAGE_SIZE,BUTTON_IMAGE_SIZE,true,true), name, BUTTON_FONT_SIZE, Color.VIOLET.darker());
+        super(new Image(WHITE_FIRE,BUTTON_IMAGE_SIZE,BUTTON_IMAGE_SIZE,true,true),
+                name, BUTTON_FONT_SIZE, Color.VIOLET.darker());
         setEffect(new Reflection());
     }
 }

@@ -115,6 +115,7 @@ public class GraphicView extends Application {
     VBox ownMap = new VBox();
     //    lists
     ListView<Button> buildingList = new ListView<>();
+
     ObservableList<Button> buildingItems = FXCollections.observableArrayList ();
 
     ListView<Button> availableBuildingList = new ListView<>();
@@ -290,7 +291,8 @@ public class GraphicView extends Application {
                 int y = j ;
                 int x = i;
                 Rectangle cell = new Rectangle(CELL_LENGTH,CELL_LENGTH);
-                if (world.currentGame.getOwnMap().getMap()[i][j].isEmpty() && world.currentGame.getOwnMap().getMap()[i][j].isConstructable()) {
+                if (world.currentGame.getOwnMap().getMap()[i][j].isEmpty() &&
+                        world.currentGame.getOwnMap().getMap()[i][j].isConstructable()) {
                     cell.setFill(Color.HOTPINK);
                     cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
                         @Override
@@ -733,9 +735,9 @@ public class GraphicView extends Application {
         public void handle(ActionEvent event) {
             System.out.println("here in key frame");
             world.currentGame.turnTimeOwnMap(speed);
-           if (stage.getScene()==showBuildingMenuScene){
-               setUpshowBuildingMenuScene();
-           }
+            if (stage.getScene()==showBuildingMenuScene){
+                setUpshowBuildingMenuScene();
+            }
         }
 
     });
@@ -1132,7 +1134,8 @@ public class GraphicView extends Application {
         attackInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                view.attackInfo(currentDefensiveWeapon.getTarget(), currentDefensiveWeapon.getHitPower(), currentDefensiveWeapon.getRADIUS_OF_ATTACK());
+                view.attackInfo(currentDefensiveWeapon.getTarget(), currentDefensiveWeapon.getHitPower(),
+                        currentDefensiveWeapon.getRADIUS_OF_ATTACK());
             }
         });
         defensiveUpgradeInfoB.setOnMouseClicked(new EventHandler<MouseEvent>() {

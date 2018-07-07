@@ -54,7 +54,9 @@ public class Icon {
     public static final String WIZARD = "clashImages\\Wizard8.PNG";
 
     public static final String DRAGON3 = "clashImages\\Dragon6.png";
-
+    public static final String ANGEL1 = "clashImages\\Healer1.png";
+    public static final String ANGEL2 = "clashImages\\Healer3.png";
+    public static final String ANGEL3 = "clashImages\\Healer5.png";
 //    public static final String
 //    public static final String
 //    public static final String

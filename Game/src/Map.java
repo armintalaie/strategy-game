@@ -23,12 +23,16 @@ class Map {
     ArrayList<WizardTower> wizardTowers = new ArrayList<>();
     ArrayList<ArcherTower> archerTowers = new ArrayList<>();
     ArrayList<AirDefense> airDefenses = new ArrayList<>();
+    ArrayList<Wall> walls = new ArrayList<>();
+    ArrayList<Trap> traps = new ArrayList<>();
+    ArrayList<GiantCastle> giantCastles = new ArrayList<>();
 
     ArrayList<Person> valuableSoldiers = new ArrayList<>();
     ArrayList<Archer> archers = new ArrayList<>();
     ArrayList<Guardian> guardians = new ArrayList<>();
     ArrayList<Giant> giants = new ArrayList<>();
     ArrayList<Dragon> dragons = new ArrayList<>();
+    ArrayList<WallBreaker> wallBreakers = new ArrayList<>();
     ArrayList<Healer> healers = new ArrayList<>();
     ArrayList<int[]> queueOfBuildingsToBeBuilt = new ArrayList<>();
     ArrayList<int[]> getQueueOfBuildingsToBeUpgraded = new ArrayList<>();
@@ -152,6 +156,7 @@ class Map {
                 barracks.add(b);
                 map[x][y].setEmpty(false);
                 buildings.add(b);
+                System.out.println("barracks added");
             }
             break;
             case 7: {
@@ -187,6 +192,27 @@ class Map {
                 wizardTowers.add(wizardTower);
                 map[x][y].setEmpty(false);
                 defensiveWeapons.add(wizardTower);
+            }
+            break;
+            case 12: {
+                Wall wall = new Wall(x, y, walls.size() + 1);
+                walls.add(wall);
+                map[x][y].setEmpty(false);
+                defensiveWeapons.add(wall);
+            }
+            break;
+            case 13: {
+                Trap trap = new Trap(x, y, traps.size() + 1);
+                traps.add(trap);
+                map[x][y].setEmpty(false);
+                defensiveWeapons.add(trap);
+            }
+            break;
+            case 14: {
+                GiantCastle giantCastle = new GiantCastle(x, y, giantCastles.size() + 1);
+                giantCastles.add(giantCastle);
+                map[x][y].setEmpty(false);
+                defensiveWeapons.add(giantCastle);
             }
             break;
         }
@@ -346,13 +372,19 @@ class Map {
                                 }
                                 break;
                                 case 5:{
-//                                    camps.get(j).addUnit(new WallBraker);
-//                                    barracks.get(i).getSoldiersTrained().put(5, barracks.get(i).getSoldiersTrained().get(5) - 1);
+                                    WallBreaker wallBreaker =new WallBreaker();
+                                   camps.get(j).addUnit(wallBreaker);
+                                    soldiers.add(wallBreaker);
+                                    wallBreakers.add(wallBreaker);
+                                    barracks.get(i).getSoldiersTrained().put(5, barracks.get(i).getSoldiersTrained().get(5) - 1);
                                 }
                                 break;
                                 case 6: {
-                                    camps.get(j).addUnit(new Healer());
-                                    barracks.get(i).getSoldiersTrained().put(6, barracks.get(i).getSoldiersTrained().get(5) - 1);
+                                    Healer healer = new Healer();
+                                    camps.get(j).addUnit(healer);
+                                    soldiers.add(healer);
+                                    healers.add(healer);
+                                    barracks.get(i).getSoldiersTrained().put(6, barracks.get(i).getSoldiersTrained().get(6) - 1);
                                 }
                                 break;
                             }
@@ -520,6 +552,27 @@ class EnemyMap {
                     for (; wizardTower.getLevel() < enemyBuilding.getLevel(); )
                         wizardTower.upgrade();
                     defensiveWeapons.add(wizardTower);
+                    break;
+                }
+                case 12: {
+                    Wall wall = new Wall(X, Y, 0);
+                    for (; wall.getLevel() < enemyBuilding.getLevel(); )
+                        wall.upgrade();
+                    defensiveWeapons.add(wall);
+                    break;
+                }
+                case 13: {
+                    Trap trap = new Trap(X, Y, 0);
+                    for (; trap.getLevel() < enemyBuilding.getLevel(); )
+                        trap.upgrade();
+                    defensiveWeapons.add(trap);
+                    break;
+                }
+                case 14: {
+                    GiantCastle giantCastle = new GiantCastle(X, Y, 0);
+                    for (; giantCastle.getLevel() < enemyBuilding.getLevel(); )
+                        giantCastle.upgrade();
+                    defensiveWeapons.add(giantCastle);
                     break;
                 }
 

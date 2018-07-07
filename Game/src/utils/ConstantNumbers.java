@@ -18,7 +18,7 @@ public class ConstantNumbers {
     public static final int MOVING_RATE = 10;
     public static final double SIZE = 33.5;
     public static final int SOLDIER_SIZE = 100;
-    public static final double SIZE_OF_ENEMY_MAP_CELL = 33.5;
-    public static final double ENEMY_MAP_X = 400 ;
+    public static final double SIZE_OF_ENEMY_MAP_CELL = 50;
+    public static final double ENEMY_MAP_X = 320 ;
     public static final double ENEMY_MAP_Y = 0 ;
 }

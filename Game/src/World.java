@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class World {
+    int situationOfLoading = 0; //it is good
     ArrayList<Game> games = new ArrayList<>();
     ArrayList<Map> maps = new ArrayList<>();
     ArrayList<EnemyMap> enemyMaps = new ArrayList<>();
@@ -71,7 +72,7 @@ public class World {
         return newGame;
     }
 
-    public World loadGame(String address, GraphicView v) {
+    public World loadGame(String address) {
         try {
             String text = new String(Files.readAllBytes((Paths.get(address))), StandardCharsets.UTF_8);
             Gson gson = new Gson();
@@ -87,31 +88,38 @@ public class World {
             world1.games.get(0).ownMap.buildings.addAll(world1.games.get(0).ownMap.elixirMines);
             world1.games.get(0).ownMap.buildings.addAll(world1.games.get(0).ownMap.goldMines);
             world1.games.get(0).ownMap.buildings.addAll(world1.games.get(0).ownMap.barracks);
+            System.out.println(world1.games.get(0).ownMap.barracks.size());
+            System.out.println("size");
 
             world1.games.get(0).ownMap.defensiveWeapons.addAll(world1.games.get(0).ownMap.wizardTowers);
             world1.games.get(0).ownMap.defensiveWeapons.addAll(world1.games.get(0).ownMap.airDefenses);
             world1.games.get(0).ownMap.defensiveWeapons.addAll(world1.games.get(0).ownMap.archerTowers);
             world1.games.get(0).ownMap.defensiveWeapons.addAll(world1.games.get(0).ownMap.cannons);
-
+            world1.games.get(0).ownMap.defensiveWeapons.addAll(world1.games.get(0).ownMap.walls);
+            world1.games.get(0).ownMap.defensiveWeapons.addAll(world1.games.get(0).ownMap.traps);
+            world1.games.get(0).ownMap.defensiveWeapons.addAll(world1.games.get(0).ownMap.giantCastles);
             world1.games.get(0).ownMap.soldiers.addAll(world1.games.get(0).ownMap.guardians);
             world1.games.get(0).ownMap.soldiers.addAll(world1.games.get(0).ownMap.giants);
             world1.games.get(0).ownMap.soldiers.addAll(world1.games.get(0).ownMap.dragons);
             world1.games.get(0).ownMap.soldiers.addAll(world1.games.get(0).ownMap.archers);
-
-
-            v.setUpVillageMenuScene();
-//            v.setUpVillageMenu();
+            world1.games.get(0).ownMap.soldiers.addAll(world1.games.get(0).ownMap.wallBreakers);
+            world1.games.get(0).ownMap.soldiers.addAll(world1.games.get(0).ownMap.healers);
+            world1.currentGame = world1.games.get(0);
+            world1.situationOfLoading=0;
+            situationOfLoading = 0; //it is good
             return world1;
         } catch (IOException e) {
             System.out.println("NO VALID FILE");
-            v.setUpNoValidAddressErr();
+            situationOfLoading = -1; //it is bad
+//            v.setUpNoValidAddressErr();
         }
         // returns -1 in case there is no valid address
-        v.setUpInitialMenuScene();
+//        v.setUpInitialMenuScene();
 //        v.setUpInitialMenu();
         return this;
 //      currentGame must be initialize
     }
+
 
     public void setEnemyMapToCurrentGame(int index) {
         currentEnemy = enemyMaps.get(index);

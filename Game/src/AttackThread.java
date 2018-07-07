@@ -1,73 +1,64 @@
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+
 import java.util.ArrayList;
 
 public class AttackThread implements Runnable {
+    private Scene scene;
+    private Stage stage ;
+    private boolean end = false;
     private AttackGUI attackGUI ;
     private EnemyMap enemyMap ;
     private Game currentGame ;
 
     @Override
     public void run() {
-        while(true) {
-         attack();
-
-
-            if(attackGUI != null){
-            attackGUI.updateSoldiers();
-            attackGUI.updateBuildings();}
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        while(!end) {
+                attack();
+                if(attackGUI != null) {
+                    attackGUI.updateSoldiers();
+                     attackGUI.updateBuildings();
+                     attackGUI.setGameStatus();
+                     attackGUI.setScore();
+                    attackGUI.setSoldierStatus();
+            }
             try {
                 Thread.sleep(1000);
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
         }
+
+
+
+
     }
 
     private void attack() {
         soldiersAttack(currentGame, enemyMap);
         defensiveBuildingsAttack(currentGame, enemyMap);
-
-      /*  if (gameFinished(enemyMap, currentGame)){
+        if (gameFinished(enemyMap, currentGame))
             endAttack(currentGame);
-            return 1;
-        }
-
-        if (num == 0) {
-            switch (input) {
-                case 3001:
-                    view.statusResourcesOfEnemy(world.currentGame.statusResourcesOfEnemy(enemyMap));
-                    break;
-                case 3002:
-                    unitTypeStatus();
-                    break;
-                case 3003:
-                    view.statusUnitPrint(world.currentGame.statusUnitsAttackMode());
-                    break;
-                case 3004:
-                    towerTypeStatus(enemyMap);
-                    break;
-                case 3005:
-                    statusTowers(enemyMap);
-                    break;
-                case 3006:
-                    statusAll(enemyMap);
-                    break;
-                case 3007:
-                    endAttack(currentGame);
-                    return 1;
-                case 3011:
-                    putSoldiersInMap();
-                    break;
-            }
-        }*/
-      //  return 0;
-    //}
-
     }
 
-
-    AttackThread (Game currentGame , EnemyMap enemyMap ){
+    AttackThread (Game currentGame , EnemyMap enemyMap , Stage stage , Scene scene ){
+        this.scene = scene;
+        this.stage = stage;
         this.enemyMap = enemyMap ;
         this.currentGame = currentGame ;
+    }
+
+    public boolean getEnd (){
+        return end;
     }
 
     public void setAttackGUI(AttackGUI attackGUI) {
@@ -197,6 +188,7 @@ public class AttackThread implements Runnable {
                 if (enemyMap.getMapBuildings().get(index).getJasonType() == 3) {
                     GoldStorage goldStorage = (GoldStorage) enemyMap.getMapBuildings().get(index);
                     game.addWonGold(goldStorage.getGoldStored());
+                    System.out.println(game.wonGold+"gggg");
                     goldStorage.addGold(-goldStorage.getGoldStored());
                 }
                 if (enemyMap.getMapBuildings().get(index).getJasonType() == 4) {
@@ -206,12 +198,14 @@ public class AttackThread implements Runnable {
                 }
                 game.addWonScore(enemyMap.getMapBuildings().get(index).getDestructionScore());
                 empty(enemyMap, enemyMap.getMapBuildings().get(index).getPosition()[0], enemyMap.getMapBuildings().get(index).getPosition()[1]);
+                attackGUI.removeBuilding(enemyMap.getMapBuildings().get(index));
                 enemyMap.getMapBuildings().remove(index);
             }
         for (int index = 0; index < enemyMap.getDefensiveWeapons().size(); index++)
             if (enemyMap.getDefensiveWeapons().get(index).getResistence() <= 0) {
                 game.addWonScore(enemyMap.getDefensiveWeapons().get(index).getSCORE());
                 empty(enemyMap, enemyMap.getDefensiveWeapons().get(index).getPosition()[0], enemyMap.getDefensiveWeapons().get(index).getPosition()[1]);
+                attackGUI.removeBuilding(enemyMap.getDefensiveWeapons().get(index));
                 enemyMap.getDefensiveWeapons().remove(index);
             }
     }
@@ -228,7 +222,6 @@ public class AttackThread implements Runnable {
                     return;
                 }
         }
-
     }
     private void healSoldiers(int [] target , int healPower  , Map map) {
         int X = target[0];
@@ -253,18 +246,32 @@ public class AttackThread implements Runnable {
             }
             updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
         }
-
     }
-
-     void updateAttackThread(int currentSoldierType, int x, int y) {
+    void updateAttackThread(int currentSoldierType, int x, int y) {
         for(int i = 0 ; i < this.currentGame.getOwnMap().valuableSoldiers.size() ; i++)
             if(this.currentGame.getOwnMap().valuableSoldiers.get(i).getType() == currentSoldierType)
                 if(!this.currentGame.getOwnMap().valuableSoldiers.get(i).getInEnemyMap()){
                     this.currentGame.getOwnMap().valuableSoldiers.get(i).setInEnemyMap(true);
                     this.currentGame.getOwnMap().valuableSoldiers.get(i).setCurrentPosition(new int[] {x,y});
                     break;
-
                 }
-
+    }
+    private boolean gameFinished(EnemyMap enemyMap, Game game) {
+        if (game.ownMap.valuableSoldiers.size() == 0)
+            return true;
+        int num = 0;
+       /* for (Person person : game.ownMap.valuableSoldiers)
+            if (person.getInEnemyMap())
+                num++;
+        if (num == 0) {
+            return true;
+        }*/
+        if (enemyMap.getMapBuildings().size() == 0 && enemyMap.getDefensiveWeapons().size() == 0)
+            return true;
+        return false;
+    }
+    private void endAttack(Game currentGame) {
+        currentGame.finishGame();
+        end = true;
     }
 }

@@ -514,6 +514,81 @@ class Dragon extends Person {
     }
 }
 
+class WallBreaker extends Person {
+    WallBreaker() {
+        type = 5;
+        this.costOfProduction = 60;
+        this.hitPower = 50 + level;
+        this.level = level;
+        this.maxDistance = 1;
+        this.timeOfProduction = 10;
+        this.radiusOfEffect = 1;
+        this.health = 100 + level * 5;
+        this.canFly = false;
+    }
+
+    @Override
+    public int[] getCurrentPosition() {
+        return currentPosition;
+    }
+
+    @Override
+    public int getType() {
+        return type;
+    }
+
+    @Override
+    int[] findPath(EnemyMap map) {
+        double minDistance = Math.sqrt(2) * 30;
+        int[] target = new int[2];
+        target[0] = -1;
+        target[1] = -1;
+        double distance;
+        for (int i = 0; i < map.getMapBuildings().size(); i++) {
+            System.out.println("hello");
+            if (map.getMapBuildings().get(i).getJasonType() == 12 ) {
+
+                distance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] - map.getMapBuildings().get(i).getPosition()[0]), 2) + Math.pow(Math.abs(currentPosition[1] - map.getMapBuildings().get(i).getPosition()[1]), 2));
+                if (minDistance > distance) {
+                    target[0] = map.getBuildings().get(i).getX();
+                    target[1] = map.getBuildings().get(i).getY();
+                    minDistance = distance;
+                }
+            }
+        }
+
+        if (minDistance != Math.sqrt(2) * 30)
+            return target;
+        for (int i = 0; i < map.getDefensiveWeapons().size(); i++) {
+            if (map.getDefensiveWeapons().get(i).getARM_TYPE() == 14) {
+                distance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] - map.getDefensiveWeapons().get(i).getPosition()[0]), 2) + Math.pow(Math.abs(currentPosition[1] - map.getDefensiveWeapons().get(i).getPosition()[1]), 2));
+                if (minDistance > distance) {
+                    target[0] = map.getDefensiveWeapons().get(i).getPosition()[0];
+                    target[1] = map.getDefensiveWeapons().get(i).getPosition()[1];
+                    minDistance = distance;
+                }
+            }
+        }
+        for (int i = 0; i < map.getMapBuildings().size(); i++) {
+            {
+                distance = Math.sqrt(Math.pow(Math.abs(currentPosition[0] - map.getMapBuildings().get(i).getPosition()[0]), 2) + Math.pow(Math.abs(currentPosition[1] - map.getMapBuildings().get(i).getPosition()[1]), 2));
+                if (minDistance > distance) {
+                    target[0] = map.getMapBuildings().get(i).getPosition()[0];
+                    target[1] = map.getMapBuildings().get(i).getPosition()[1];
+                    minDistance = distance;
+                }
+            }
+        }
+        return target;
+    }
+
+    @Override
+    int[] attack(int[] target, EnemyMap map) {
+        return new int[]{target[0], target[1], hitPower};
+    }
+
+}
+
 class Healer extends Person {
     Healer() {
         type = 6;
