@@ -432,7 +432,7 @@ class Giant extends Person {
 
 class Dragon extends Person {
     Dragon() {
-        type = 4;
+        type = 3;
         this.costOfProduction = 175;
         this.hitPower = 30 + level;
         this.level = level;

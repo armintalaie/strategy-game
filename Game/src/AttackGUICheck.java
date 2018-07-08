@@ -1,3 +1,4 @@
+
 import com.google.gson.Gson;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -14,7 +15,7 @@ public class AttackGUICheck extends Application
     public static void main(String[] args) {
         System.out.println("before launch");
         Application.launch(args);
-        System.out.println("hh");
+        System.out.println("after launch");
     }
 
     @Override
@@ -31,7 +32,7 @@ public class AttackGUICheck extends Application
             enemyMap1.initializeMap();
             enemyMap = enemyMap1;
         }catch (Exception e){
-            System.out.println("ececpti");
+            System.out.println("excecption");
             System.out.println(e.getStackTrace());
         }
 
@@ -48,6 +49,8 @@ public class AttackGUICheck extends Application
         game.getOwnMap().valuableSoldiers.add(new Archer());
         game.getOwnMap().valuableSoldiers.add(new Archer());
         game.getOwnMap().valuableSoldiers.add(new Archer());
+
+        game.getOwnMap().valuableSoldiers.add(new Healer());
 
         game.getOwnMap().valuableSoldiers.add(dragon);
         AttackThread attackThread =new AttackThread(game,enemyMap , primaryStage , new Scene(new Group()));

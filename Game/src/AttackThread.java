@@ -23,13 +23,14 @@ public class AttackThread implements Runnable {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
+            System.out.println("exception in running");
             e.printStackTrace();
         }
         while(!end) {
                 attack();
                 if(attackGUI != null) {
                     attackGUI.updateSoldiers();
-                     attackGUI.updateBuildings();
+//                     attackGUI.updateBuildings();
                      attackGUI.setGameStatus();
                      attackGUI.setScore();
                     attackGUI.setSoldierStatus();
@@ -38,6 +39,7 @@ public class AttackThread implements Runnable {
                 Thread.sleep(1000);
 
             } catch (InterruptedException e) {
+                System.out.println("exception in sleeping thread");
                 e.printStackTrace();
             }
 
@@ -78,39 +80,17 @@ public class AttackThread implements Runnable {
     public Game getCurrentGame() {
         return currentGame;
     }
+    private void printValueableSoldiers(){
+        System.out.println("current valuable soldiers are:");
+        for (Person person :currentGame.getOwnMap().valuableSoldiers){
+            System.out.println(person.getType());
+        }
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private  void soldiersAttack(Game currentGame, EnemyMap enemyMap) {
+        printValueableSoldiers();
         ArrayList<Person> people = new ArrayList<>();
-//        ArrayList<Person> toLoseHealth = new ArrayList<>();
-//        Iterator<Person> iterator = currentGame.getOwnMap().valuableSoldiers.iterator();
-//        while (iterator.hasNext()){
-//
-//            Person person = iterator.next();
-//            if (person.getType() != 6 && person.getInEnemyMap()) {
-//
-//                int[] target = person.operate(enemyMap);
-//                if (target != null)
-//                    hitEnemyBuilding(target, enemyMap);
-////                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
-//            }
-//            if(person.getType() == 6 && person.getInEnemyMap()){
-//                int [] target =  person.operate(currentGame.getOwnMap() , enemyMap);
-//                if(target != null){
-//                    Healer healer =(Healer) person ;
-//                    healSoldiers ( target ,  healer.getHitPower() ,  currentGame.getOwnMap());
-//                    toLoseHealth.add(person);
-////                   ((Healer) person).loseHealth();
-//                }
-////                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
-//            }
-////            synchronized (this){
-////                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
-////            }
-//        }
-//        for (Person person : currentGame.getOwnMap().valuableSoldiers){
-//            updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
-//        }
         for (Person person : currentGame.getOwnMap().valuableSoldiers){
             if (person.getType() != 6 && person.getInEnemyMap()) {
                 int[] target = person.operate(enemyMap);
@@ -124,20 +104,16 @@ public class AttackThread implements Runnable {
                 if(target != null){
                     Healer healer =(Healer) person ;
                     healSoldiers ( target ,  healer.getHitPower() ,  currentGame.getOwnMap());
-//                    toLoseHealth.add(person);
                     ((Healer) person).loseHealth();
+                    System.out.println("healer losing health");
                     people.add(person);
                 }
 //                updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
             }
         }
-        for (Person p : people){
+        for (Person person : people){
             updateAttackMap(currentGame.getOwnMap().valuableSoldiers, enemyMap, currentGame.getOwnMap(), currentGame);
         }
-//        for (Person p : toLoseHealth){
-//           ((Healer) p).loseHealth();
-//        }
-////        toLoseHealth.clear();
     }
 
     private void hitEnemyBuilding(int[] attack, EnemyMap enemyMap) {
@@ -220,6 +196,7 @@ public class AttackThread implements Runnable {
     private void updateAttackMap(ArrayList<Person> soldiers, EnemyMap enemyMap, Map map, Game game) {
         for (int index = 0; index < soldiers.size(); index++)
             if (soldiers.get(index).getHealth() <= 0) {
+
                 for (int indexPrime = 0; indexPrime < game.getOwnMap().soldiers.size(); indexPrime++)
                     if (game.getOwnMap().soldiers.get(indexPrime).getType() == soldiers.get(index).getType()) {
                         removeFromCamp(game, game.getOwnMap().soldiers.get(indexPrime).getType());
@@ -230,10 +207,11 @@ public class AttackThread implements Runnable {
             }
         for (int index = 0; index < enemyMap.getMapBuildings().size(); index++)
             if (enemyMap.getMapBuildings().get(index).getResistance() <= 0) {
+                System.out.println("removing building in thread");
                 if (enemyMap.getMapBuildings().get(index).getJasonType() == 3) {
                     GoldStorage goldStorage = (GoldStorage) enemyMap.getMapBuildings().get(index);
                     game.addWonGold(goldStorage.getGoldStored());
-                    System.out.println(game.wonGold+"gggg");
+                    System.out.println(game.wonGold+"won Gold!");
                     goldStorage.addGold(-goldStorage.getGoldStored());
                 }
                 if (enemyMap.getMapBuildings().get(index).getJasonType() == 4) {
@@ -248,6 +226,7 @@ public class AttackThread implements Runnable {
             }
         for (int index = 0; index < enemyMap.getDefensiveWeapons().size(); index++)
             if (enemyMap.getDefensiveWeapons().get(index).getResistence() <= 0) {
+                System.out.println("removing defensive weapon in thread");
                 game.addWonScore(enemyMap.getDefensiveWeapons().get(index).getSCORE());
                 empty(enemyMap, enemyMap.getDefensiveWeapons().get(index).getPosition()[0], enemyMap.getDefensiveWeapons().get(index).getPosition()[1]);
                 attackGUI.removeBuilding(enemyMap.getDefensiveWeapons().get(index));
@@ -314,8 +293,13 @@ public class AttackThread implements Runnable {
         if (num == 0) {
             return true;
         }*/
-        if (enemyMap.getMapBuildings().size() == 0 && enemyMap.getDefensiveWeapons().size() == 0)
+        if (enemyMap.getMapBuildings().size() == 0 && enemyMap.getDefensiveWeapons().size() == 0){
+            for (Person p : game.ownMap.valuableSoldiers ){
+                p.setInEnemyMap(false);
+            }
             return true;
+        }
+
         return false;
     }
     private void endAttack(Game currentGame) {

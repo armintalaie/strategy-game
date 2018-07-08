@@ -753,7 +753,8 @@ public class Game {
     }
 
     public void finishGame() {
-
+        System.out.println("finish is caled");
+        ownMap.valuableSoldiers.clear();
         for (int index = 0; index < ownMap.valuableSoldiers.size(); index++) {
             ownMap.valuableSoldiers.remove(index);
         }

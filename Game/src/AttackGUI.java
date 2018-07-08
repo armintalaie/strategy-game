@@ -307,6 +307,7 @@ public class AttackGUI {
             @Override
             public void run() {
                 stackPane.getChildren().remove(1);
+//                mapResult.getChildren().remove(hBox);
             }
         });
     }
@@ -328,7 +329,8 @@ public class AttackGUI {
                 int x = i ;
                 int y = j;
                 StackPane stackPane = new StackPane();
-                javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView(new Image(GRASS0,SIZE_OF_ENEMY_MAP_CELL,SIZE_OF_ENEMY_MAP_CELL,true,true));
+                javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView
+                        (new Image(GRASS0,SIZE_OF_ENEMY_MAP_CELL,SIZE_OF_ENEMY_MAP_CELL,true,true));
                 stackPane.getChildren().add(imageView);
                 stackPane.setOnMouseClicked(event -> {
                     if(currentSoldierType != -1){
@@ -375,7 +377,12 @@ public class AttackGUI {
         for(int i = 0 ; i< enemyMap.getDefensiveWeapons().size() ; i++){
             DefensiveWeaponGUI defensiveWeaponGUI = new DefensiveWeaponGUI(enemyMap.getDefensiveWeapons().get(i));
             defensiveWeaponGUIS.add(defensiveWeaponGUI);
-            map.getChildren().add(defensiveWeaponGUIS.get(defensiveWeaponGUIS.size()-1).getImageView());
+//            map.getChildren().add(defensiveWeaponGUIS.get(defensiveWeaponGUIS.size()-1).getImageView());
+            HBox hBox = (HBox) mapResult.getChildren().get(enemyMap.getDefensiveWeapons().get(i).getPosition()[0]);
+            StackPane stackPane = (StackPane) hBox.getChildren().get(enemyMap.getDefensiveWeapons().get(i).getPosition()[1]);
+            //hBox.getChildren().add(buildingGUIS.get(buildingGUIS.size()-1).getImageView());
+            stackPane.getChildren().add(defensiveWeaponGUIS.get(defensiveWeaponGUIS.size()-1).getImageView());
+
         }
 
     }
@@ -386,7 +393,7 @@ public class AttackGUI {
         for(int i = 0 ; i < valuableSoldiers.size() ; i++)
             if(valuableSoldiers.get(i).getType() == currentSoldierType)
                 if(!valuableSoldiers.get(i).getInEnemyMap()){
-            System.out.println("jjjj");
+            System.out.println("putting soldier on map");
                     valuableSoldiers.get(i).setCurrentPosition(new int[] {x , y});
                     valuableSoldiers.get(i).setInEnemyMap(true);
                     soldierGUIS.add(new SoldierGUI(valuableSoldiers.get(i)));
@@ -407,6 +414,7 @@ public class AttackGUI {
     private void setSoldiersOnDashBoard(){
         HBox soldiers = new HBox();
         for (int i = 1; i < 7; i++) {
+            System.out.println(i +" ; soldier type");
             BouncingIcon bouncingIcon = new BouncingIcon(new Image(SoldierPhoto.get(i),50,50,true,true));
             soldiers.getChildren().add(bouncingIcon);
             int j = i;
@@ -433,10 +441,13 @@ public class AttackGUI {
     }
     public void updateSoldiers (){
         for(int i = 0 ; i < soldierGUIS.size() ; i++) {
-            soldierGUIS.get(i).progressBar.relocate(SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[1], SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[0] - 10);
+            soldierGUIS.get(i).progressBar.relocate(SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[1],
+                    SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[0] - 10);
 
             //System.out.println("hilo"+soldierGUIS.get(i).getPerson().getCurrentPosition()[1]);
-            soldierGUIS.get(i).imageView.relocate(SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[1], SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[0]);
+            soldierGUIS.get(i).imageView.relocate
+                    (SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[1],
+                            SIZE_OF_ENEMY_MAP_CELL * soldierGUIS.get(i).getPerson().getCurrentPosition()[0]);
         }
     }
 
@@ -445,25 +456,29 @@ public class AttackGUI {
             if(buildingGUIS != null)
                 for(int i = 0 ; i < buildingGUIS.size() ; i++) {
                     if(buildingGUIS.get(i).getBuilding() == null){
+                        System.out.println("here in if in update building");
                         map.getChildren().remove(buildingGUIS.get(i).getImageView()) ;
                     }
-                    else{
-                        if(buildingGUIS.get(i).getBuilding().getHealth() <= 0 || buildingGUIS.get(i).getBuilding().getResistance() <= 0 ){
-                            map.getChildren().remove(buildingGUIS.get(i).getImageView()) ;
-                        }
-                    }
+//                    else{
+//                        if(buildingGUIS.get(i).getBuilding().getHealth() <= 0 || buildingGUIS.get(i).getBuilding().getResistance() <= 0 ){
+//                            map.getChildren().remove(buildingGUIS.get(i).getImageView()) ;
+//                            System.out.println("building  is removed in updateBuildings\n\n");
+//                        }
+//                    }
 
                 }
             if(defensiveWeaponGUIS != null)
                 for(int i = 0 ; i < defensiveWeaponGUIS.size() ; i++) {
                     if(defensiveWeaponGUIS.get(i).getDefensiveWeapon() == null){
+                        System.out.println("here in if in for defensive...");
                         map.getChildren().remove(defensiveWeaponGUIS.get(i).getImageView()) ;
                     }
-                    else{
-                        if(defensiveWeaponGUIS.get(i).getDefensiveWeapon().getResistence() <= 0){
-                            map.getChildren().remove(defensiveWeaponGUIS.get(i).getImageView()) ;
-                        }
-                    }
+//                    else{
+//                        if(defensiveWeaponGUIS.get(i).getDefensiveWeapon().getResistence() <= 0){
+//                            System.out.println("defensive weapon is removed in updateBuildings\n\n");
+//                            map.getChildren().remove(defensiveWeaponGUIS.get(i).getImageView()) ;
+//                        }
+//                    }
 
                 }}
         catch (Exception e){}
@@ -542,7 +557,7 @@ class BuildingGUI {
 
         this.imageView = imageView;
         this.building = building;
-        System.out.println("hello");
+        System.out.println("building gui");
         System.out.println(building.getPosition()[0]+" "+building.getPosition()[1]);
     }
 
